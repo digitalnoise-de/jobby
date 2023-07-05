@@ -40,9 +40,6 @@
     </PossiblyUndefinedArrayOffset>
   </file>
   <file src="src/Helper.php">
-    <InvalidScalarArgument>
-      <code>getmypid()</code>
-    </InvalidScalarArgument>
     <MixedArgument>
       <code>$config['recipients']</code>
       <code>$config['smtpHost']</code>
@@ -56,13 +53,13 @@
       <code><![CDATA[[$config['smtpSender'] => $config['smtpSenderName']]]]></code>
     </MixedArrayOffset>
     <MixedInferredReturnType>
-      <code>Swift_Mailer</code>
+      <code>\Swift_Mailer</code>
     </MixedInferredReturnType>
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$this->lockHandles[$lockFile]]]></code>
     </RedundantConditionGivenDocblockType>
     <UndefinedClass>
-      <code>Swift_MailTransport</code>
+      <code>\Swift_MailTransport</code>
     </UndefinedClass>
   </file>
   <file src="src/Jobby.php">

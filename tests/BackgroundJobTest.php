@@ -1,15 +1,16 @@
 <?php
+declare(strict_types=1);
 
 namespace Jobby\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Jobby\BackgroundJob;
 use Jobby\Helper;
 use Opis\Closure\SerializableClosure;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @coversDefaultClass Jobby\BackgroundJob
+ * @coversDefaultClass \Jobby\BackgroundJob
  */
 class BackgroundJobTest extends TestCase
 {
@@ -22,9 +23,6 @@ class BackgroundJobTest extends TestCase
 
     private Helper $helper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->logFile = __DIR__ . '/_files/BackgroundJobTest.log';
@@ -35,9 +33,6 @@ class BackgroundJobTest extends TestCase
         $this->helper = new Helper();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         if (file_exists($this->logFile)) {
@@ -72,10 +67,12 @@ class BackgroundJobTest extends TestCase
 
     /**
      * @covers ::getConfig
+     *
+     * @test
      */
-    public function testGetConfig(): void
+    public function getConfig(): void
     {
-        $job = new BackgroundJob('test job',[]);
+        $job = new BackgroundJob('test job', []);
         static::assertIsArray($job->getConfig());
     }
 
@@ -86,8 +83,10 @@ class BackgroundJobTest extends TestCase
      *
      * @param array<string, mixed> $config
      * @param string|int           $expectedOutput
+     *
+     * @test
      */
-    public function testRun(array $config, $expectedOutput): void
+    public function runShouldLogOutput(array $config, $expectedOutput): void
     {
         $this->runJob($config);
 
@@ -96,8 +95,10 @@ class BackgroundJobTest extends TestCase
 
     /**
      * @covers ::runFile
+     *
+     * @test
      */
-    public function testInvalidCommand(): void
+    public function invalidCommand(): void
     {
         $this->runJob(['command' => 'invalid-command']);
 
@@ -113,12 +114,14 @@ class BackgroundJobTest extends TestCase
 
     /**
      * @covers ::runFunction
+     *
+     * @test
      */
-    public function testClosureNotReturnTrue(): void
+    public function closureNotReturnTrue(): void
     {
         $this->runJob(
             [
-                'closure' => fn() => false,
+                'closure' => fn () => false,
             ]
         );
 
@@ -127,13 +130,15 @@ class BackgroundJobTest extends TestCase
 
     /**
      * @covers ::getLogFile
+     *
+     * @test
      */
-    public function testHideStdOutByDefault(): void
+    public function hideStdOutByDefault(): void
     {
         ob_start();
         $this->runJob(
             [
-                'closure' => function () {
+                'closure' => function (): void {
                     echo 'foo bar';
                 },
                 'output'  => null,
@@ -147,13 +152,15 @@ class BackgroundJobTest extends TestCase
 
     /**
      * @covers ::getLogFile
+     *
+     * @test
      */
-    public function testShouldCreateLogFolder(): void
+    public function shouldCreateLogFolder(): void
     {
         $logfile = dirname($this->logFile) . '/foo/bar.log';
         $this->runJob(
             [
-                'closure' => function () {
+                'closure' => function (): void {
                     echo 'foo bar';
                 },
                 'output'  => $logfile,
@@ -161,7 +168,7 @@ class BackgroundJobTest extends TestCase
         );
 
         $dirExists = file_exists(dirname($logfile));
-        $isDir = is_dir(dirname($logfile));
+        $isDir     = is_dir(dirname($logfile));
 
         unlink($logfile);
         rmdir(dirname($logfile));
@@ -172,15 +179,17 @@ class BackgroundJobTest extends TestCase
 
     /**
      * @covers ::getLogFile
+     *
+     * @test
      */
-    public function testShouldSplitStderrAndStdout(): void
+    public function shouldSplitStderrAndStdout(): void
     {
         $dirname = dirname($this->logFile);
-        $stdout = $dirname . '/stdout.log';
-        $stderr = $dirname . '/stderr.log';
+        $stdout  = $dirname . '/stdout.log';
+        $stderr  = $dirname . '/stderr.log';
         $this->runJob(
             [
-                'command' => "(echo \"stdout output\" && (>&2 echo \"stderr output\"))",
+                'command'       => '(echo "stdout output" && (>&2 echo "stderr output"))',
                 'output_stdout' => $stdout,
                 'output_stderr' => $stderr,
             ]
@@ -191,13 +200,14 @@ class BackgroundJobTest extends TestCase
 
         unlink($stderr);
         unlink($stdout);
-
     }
 
     /**
      * @covers ::mail
+     *
+     * @test
      */
-    public function testNotSendMailOnMissingRecipients(): void
+    public function notSendMailOnMissingRecipients(): void
     {
         $helper = $this->createMock(Helper::class);
         $helper->expects(static::never())
@@ -206,7 +216,7 @@ class BackgroundJobTest extends TestCase
 
         $this->runJob(
             [
-                'closure'    => fn() => false,
+                'closure'    => fn () => false,
                 'recipients' => '',
             ],
             $helper
@@ -215,8 +225,10 @@ class BackgroundJobTest extends TestCase
 
     /**
      * @covers ::mail
+     *
+     * @test
      */
-    public function testMailShouldTriggerHelper(): void
+    public function mailShouldTriggerHelper(): void
     {
         $helper = $this->createPartialMock(Helper::class, ['sendMail']);
         $helper->expects(static::once())
@@ -225,7 +237,7 @@ class BackgroundJobTest extends TestCase
 
         $this->runJob(
             [
-                'closure'    => fn() => false,
+                'closure'    => fn () => false,
                 'recipients' => 'test@example.com',
             ],
             $helper
@@ -234,8 +246,10 @@ class BackgroundJobTest extends TestCase
 
     /**
      * @covers ::checkMaxRuntime
+     *
+     * @test
      */
-    public function testCheckMaxRuntime(): void
+    public function checkMaxRuntime(): void
     {
         if ($this->helper->getPlatform() !== Helper::UNIX) {
             static::markTestSkipped("'maxRuntime' is not supported on Windows");
@@ -260,8 +274,10 @@ class BackgroundJobTest extends TestCase
 
     /**
      * @covers ::checkMaxRuntime
+     *
+     * @test
      */
-    public function testCheckMaxRuntimeShouldFailIsExceeded(): void
+    public function checkMaxRuntimeShouldFailIsExceeded(): void
     {
         if ($this->helper->getPlatform() !== Helper::UNIX) {
             static::markTestSkipped("'maxRuntime' is not supported on Windows");
@@ -286,14 +302,14 @@ class BackgroundJobTest extends TestCase
 
     /**
      * @dataProvider haltDirProvider
+     *
      * @covers       ::shouldRun
      *
-     * @param bool $createFile
-     * @param bool $jobRuns
+     * @test
      */
-    public function testHaltDir(bool $createFile, bool $jobRuns): void
+    public function haltDir(bool $createFile, bool $jobRuns): void
     {
-        $dir = __DIR__ . '/_files';
+        $dir  = __DIR__ . '/_files';
         $file = $dir . '/' . static::JOB_NAME;
 
         $fs = new Filesystem();
@@ -353,7 +369,7 @@ class BackgroundJobTest extends TestCase
         $helper = new Helper();
 
         if (isset($config['closure'])) {
-            $wrapper = new SerializableClosure($config['closure']);
+            $wrapper           = new SerializableClosure($config['closure']);
             $config['closure'] = serialize($wrapper);
         }
 

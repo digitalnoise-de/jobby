@@ -1,6 +1,8 @@
 <?php
+declare(strict_types=1);
 
 use Jobby\Jobby;
+
 //
 // Add this line to your crontab file:
 //
@@ -13,8 +15,9 @@ $jobby = new Jobby();
 
 $jobby->add('CommandExample', ['command' => 'ls', 'schedule' => '* * * * *', 'output' => 'logs/command.log', 'enabled' => true]);
 
-$jobby->add('ClosureExample', ['command' => function() {
+$jobby->add('ClosureExample', ['command' => function () {
     echo "I'm a function!\n";
+
     return true;
 }, 'schedule' => '* * * * *', 'output' => 'logs/closure.log', 'enabled' => true]);
 

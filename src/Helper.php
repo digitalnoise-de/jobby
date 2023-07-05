@@ -1,12 +1,8 @@
 <?php
+declare(strict_types=1);
+
 namespace Jobby;
 
-use Swift_Mailer;
-use Swift_Message;
-use Swift;
-use Swift_SmtpTransport;
-use Swift_MailTransport;
-use Swift_SendmailTransport;
 class Helper
 {
     /**
@@ -24,22 +20,21 @@ class Helper
      */
     private array $lockHandles = [];
 
-    private ?Swift_Mailer $mailer = null;
+    private ?\Swift_Mailer $mailer = null;
 
     /**
-     * @param Swift_Mailer $mailer
+     * @param \Swift_Mailer $mailer
      */
-    public function __construct(Swift_Mailer $mailer = null)
+    public function __construct(\Swift_Mailer $mailer = null)
     {
         $this->mailer = $mailer;
     }
 
     /**
      * @param string $job
-     * @param array  $config
      * @param string $message
      *
-     * @return Swift_Message
+     * @return \Swift_Message
      */
     public function sendMail($job, array $config, $message)
     {
@@ -52,7 +47,7 @@ You can find its output in {$config['output']} on $host.
 Best,
 jobby@$host
 EOF;
-        $mail = new Swift_Message();
+        $mail = new \Swift_Message();
         $mail->setTo(explode(',', $config['recipients']));
         $mail->setSubject("[$host] '{$job}' needs some attention!");
         $mail->setBody($body);
@@ -66,9 +61,7 @@ EOF;
     }
 
     /**
-     * @param array $config
-     *
-     * @return Swift_Mailer
+     * @return \Swift_Mailer
      */
     private function getCurrentMailer(array $config)
     {
@@ -76,10 +69,10 @@ EOF;
             return $this->mailer;
         }
 
-        $swiftVersion = (int) explode('.', Swift::VERSION)[0];
+        $swiftVersion = (int)explode('.', \Swift::VERSION)[0];
 
         if ($config['mailer'] === 'smtp') {
-            $transport = new Swift_SmtpTransport(
+            $transport = new \Swift_SmtpTransport(
                 $config['smtpHost'],
                 $config['smtpPort'],
                 $config['smtpSecurity']
@@ -87,12 +80,12 @@ EOF;
             $transport->setUsername($config['smtpUsername']);
             $transport->setPassword($config['smtpPassword']);
         } elseif ($swiftVersion < 6 && $config['mailer'] === 'mail') {
-            $transport = Swift_MailTransport::newInstance();
+            $transport = \Swift_MailTransport::newInstance();
         } else {
-            $transport = new Swift_SendmailTransport();
+            $transport = new \Swift_SendmailTransport();
         }
 
-        return new Swift_Mailer($transport);
+        return new \Swift_Mailer($transport);
     }
 
     /**
@@ -119,7 +112,7 @@ EOF;
             if (flock($fh, LOCK_EX | LOCK_NB)) {
                 $this->lockHandles[$lockFile] = $fh;
                 ftruncate($fh, 0);
-                fwrite($fh, getmypid());
+                fwrite($fh, (string)getmypid());
 
                 return;
             }
@@ -158,13 +151,13 @@ EOF;
             return 0;
         }
 
-        if (!posix_kill((int) $pid, 0)) {
+        if (!posix_kill((int)$pid, 0)) {
             return 0;
         }
 
         $stat = stat($lockFile);
 
-        return (time() - $stat['mtime']);
+        return time() - $stat['mtime'];
     }
 
     public function getTempDir(): string
@@ -224,6 +217,7 @@ EOF;
         if ($platform === self::UNIX) {
             return '/dev/null';
         }
+
         return 'NUL';
     }
 }

@@ -1,16 +1,20 @@
 <?php
+declare(strict_types=1);
 
 namespace Jobby\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Jobby\Exception;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @covers Jobby\Exception
+ * @covers \Jobby\Exception
  */
 class ExceptionTest extends TestCase
 {
-    public function testInheritsBaseException(): void
+    /**
+     * @test
+     */
+    public function inheritsBaseException(): void
     {
         $e = new Exception();
         static::assertTrue($e instanceof \Exception);

@@ -1,15 +1,16 @@
 <?php
+declare(strict_types=1);
 
 namespace Jobby\Tests;
 
 use Jobby\Exception;
-use PHPUnit\Framework\TestCase;
 use Jobby\Helper;
 use Jobby\Jobby;
 use Opis\Closure\SerializableClosure;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass Jobby\Jobby
+ * @coversDefaultClass \Jobby\Jobby
  */
 class JobbyTest extends TestCase
 {
@@ -20,9 +21,6 @@ class JobbyTest extends TestCase
 
     private Helper $helper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->logFile = __DIR__ . '/_files/JobbyTest.log';
@@ -33,9 +31,6 @@ class JobbyTest extends TestCase
         $this->helper = new Helper();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         if (file_exists($this->logFile)) {
@@ -46,8 +41,10 @@ class JobbyTest extends TestCase
     /**
      * @covers ::add
      * @covers ::run
+     *
+     * @test
      */
-    public function testShell(): void
+    public function shell(): void
     {
         $jobby = new Jobby();
         $jobby->add(
@@ -67,11 +64,11 @@ class JobbyTest extends TestCase
     }
 
     /**
-     * @return void
+     * @test
      */
-    public function testBackgroundProcessIsNotSpawnedIfJobIsNotDueToBeRun(): void
+    public function backgroundProcessIsNotSpawnedIfJobIsNotDueToBeRun(): void
     {
-        $hour = date("H", strtotime("+1 hour"));
+        $hour  = date('H', strtotime('+1 hour'));
         $jobby = new Jobby();
         $jobby->add(
             'HelloWorldShell',
@@ -92,8 +89,10 @@ class JobbyTest extends TestCase
     /**
      * @covers ::add
      * @covers ::run
+     *
+     * @test
      */
-    public function testOpisClosure(): void
+    public function opisClosure(): void
     {
         $fn = static function (): bool {
             echo 'Another function!';
@@ -101,11 +100,11 @@ class JobbyTest extends TestCase
             return true;
         };
 
-        $jobby = new Jobby();
-        $wrapper = new SerializableClosure($fn);
+        $jobby      = new Jobby();
+        $wrapper    = new SerializableClosure($fn);
         $serialized = serialize($wrapper);
-        $wrapper = unserialize($serialized);
-        $closure = $wrapper->getClosure();
+        $wrapper    = unserialize($serialized);
+        $closure    = $wrapper->getClosure();
 
         $jobby->add(
             'HelloWorldClosure',
@@ -126,8 +125,10 @@ class JobbyTest extends TestCase
     /**
      * @covers ::add
      * @covers ::run
+     *
+     * @test
      */
-    public function testClosure(): void
+    public function closure(): void
     {
         $jobby = new Jobby();
         $jobby->add(
@@ -153,8 +154,10 @@ class JobbyTest extends TestCase
     /**
      * @covers ::add
      * @covers ::run
+     *
+     * @test
      */
-    public function testShouldRunAllJobsAdded(): void
+    public function shouldRunAllJobsAdded(): void
     {
         $jobby = new Jobby(['output' => $this->logFile]);
         $jobby->add(
@@ -191,15 +194,17 @@ class JobbyTest extends TestCase
     /**
      * This is the same test as testClosure but (!) we use the default
      * options to set the output file.
+     *
+     * @test
      */
-    public function testDefaultOptionsShouldBeMerged(): void
+    public function defaultOptionsShouldBeMerged(): void
     {
         $jobby = new Jobby(['output' => $this->logFile]);
         $jobby->add(
             'HelloWorldClosure',
             [
                 'command'  => static function () {
-                    echo "A function!";
+                    echo 'A function!';
 
                     return true;
                 },
@@ -216,10 +221,12 @@ class JobbyTest extends TestCase
 
     /**
      * @covers ::getDefaultConfig
+     *
+     * @test
      */
-    public function testDefaultConfig(): void
+    public function defaultConfig(): void
     {
-        $jobby = new Jobby();
+        $jobby  = new Jobby();
         $config = $jobby->getDefaultConfig();
 
         static::assertNull($config['recipients']);
@@ -234,10 +241,12 @@ class JobbyTest extends TestCase
     /**
      * @covers ::setConfig
      * @covers ::getConfig
+     *
+     * @test
      */
-    public function testSetConfig(): void
+    public function setConfig(): void
     {
-        $jobby = new Jobby();
+        $jobby  = new Jobby();
         $oldCfg = $jobby->getConfig();
 
         $jobby->setConfig(['dateFormat' => 'foo bar']);
@@ -249,8 +258,10 @@ class JobbyTest extends TestCase
 
     /**
      * @covers ::getJobs
+     *
+     * @test
      */
-    public function testGetJobs(): void
+    public function getJobs(): void
     {
         $jobby = new Jobby();
         static::assertCount(0, $jobby->getJobs());
@@ -258,16 +269,16 @@ class JobbyTest extends TestCase
         $jobby->add(
             'test job1',
             [
-                'command' => 'test',
-                'schedule' => '* * * * *'
+                'command'  => 'test',
+                'schedule' => '* * * * *',
             ]
         );
 
         $jobby->add(
             'test job2',
             [
-                'command' => 'test',
-                'schedule' => '* * * * *'
+                'command'  => 'test',
+                'schedule' => '* * * * *',
             ]
         );
 
@@ -276,8 +287,10 @@ class JobbyTest extends TestCase
 
     /**
      * @covers ::add
+     *
+     * @test
      */
-    public function testExceptionOnMissingJobOptionCommand(): void
+    public function exceptionOnMissingJobOptionCommand(): void
     {
         $this->expectException(Exception::class);
         $jobby = new Jobby();
@@ -292,8 +305,10 @@ class JobbyTest extends TestCase
 
     /**
      * @covers ::add
+     *
+     * @test
      */
-    public function testExceptionOnMissingJobOptionSchedule(): void
+    public function exceptionOnMissingJobOptionSchedule(): void
     {
         $this->expectException(Exception::class);
         $jobby = new Jobby();
@@ -301,7 +316,7 @@ class JobbyTest extends TestCase
         $jobby->add(
             'should fail',
             [
-                'command' => static function () {
+                'command' => static function (): void {
                 },
             ]
         );
@@ -311,14 +326,16 @@ class JobbyTest extends TestCase
      * @covers ::run
      * @covers ::runWindows
      * @covers ::runUnix
+     *
+     * @test
      */
-    public function testShouldRunJobsAsync(): void
+    public function shouldRunJobsAsync(): void
     {
         $jobby = new Jobby();
         $jobby->add(
             'HelloWorldClosure',
             [
-                'command'  => fn() => true,
+                'command'  => fn () => true,
                 'schedule' => '* * * * *',
             ]
         );
@@ -330,7 +347,10 @@ class JobbyTest extends TestCase
         static::assertLessThan(0.5, $duration);
     }
 
-    public function testShouldFailIfMaxRuntimeExceeded(): void
+    /**
+     * @test
+     */
+    public function shouldFailIfMaxRuntimeExceeded(): void
     {
         if ($this->helper->getPlatform() === Helper::WINDOWS) {
             static::markTestSkipped("'maxRuntime' is not supported on Windows");

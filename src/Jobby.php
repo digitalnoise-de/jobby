@@ -1,9 +1,8 @@
 <?php
+declare(strict_types=1);
 
 namespace Jobby;
 
-use Closure;
-use DateTimeImmutable;
 use Opis\Closure\SerializableClosure;
 use Symfony\Component\Process\PhpExecutableFinder;
 
@@ -100,7 +99,7 @@ class Jobby
     /**
      * Add a job.
      *
-     * @param array<string, mixed>  $config
+     * @param array<string, mixed> $config
      *
      * @throws Exception
      */
@@ -114,10 +113,10 @@ class Jobby
             throw new Exception("Either 'command' or 'closure' is required for '$job' job");
         }
 
-        if (isset($config['command']) &&
-            (
-                $config['command'] instanceof Closure ||
-                $config['command'] instanceof SerializableClosure
+        if (isset($config['command'])
+            && (
+                $config['command'] instanceof \Closure
+                || $config['command'] instanceof SerializableClosure
             )
         ) {
             $config['closure'] = $config['command'];
@@ -128,7 +127,7 @@ class Jobby
             }
         }
 
-        $config = array_merge($this->config, $config);
+        $config       = array_merge($this->config, $config);
         $this->jobs[] = [$job, $config];
     }
 
@@ -143,7 +142,7 @@ class Jobby
             throw new Exception('posix extension is required');
         }
 
-        $scheduleChecker = new ScheduleChecker(new DateTimeImmutable("now"));
+        $scheduleChecker = new ScheduleChecker(new \DateTimeImmutable('now'));
         foreach ($this->jobs as $jobConfig) {
             [$job, $config] = $jobConfig;
             if (!$scheduleChecker->isDue($config['schedule'])) {
@@ -163,7 +162,7 @@ class Jobby
     protected function runUnix(string $job, array $config): void
     {
         $command = $this->getExecutableCommand($job, $config);
-        $binary = $this->getPhpBinary();
+        $binary  = $this->getPhpBinary();
 
         $output = $config['debug'] ? 'debug.log' : '/dev/null';
         exec("$binary $command 1> $output 2>&1 &");
@@ -180,25 +179,25 @@ class Jobby
         $binary = $this->getPhpBinary();
 
         $command = $this->getExecutableCommand($job, $config);
-        pclose(popen("start \"blah\" /B \"$binary\" $command", "r"));
+        pclose(popen("start \"blah\" /B \"$binary\" $command", 'r'));
     }
     // @codeCoverageIgnoreEnd
 
     /**
      * @param string $job
-     * @param array  $config
      *
      * @return string
      */
     protected function getExecutableCommand($job, array $config)
     {
         if (isset($config['closure'])) {
-            $wrapper = new SerializableClosure($config['closure']);
+            $wrapper           = new SerializableClosure($config['closure']);
             $config['closure'] = serialize($wrapper);
         }
 
         if (strpos(__DIR__, 'phar://') === 0) {
             $script = __DIR__ . DIRECTORY_SEPARATOR . 'BackgroundJob.php';
+
             return sprintf(' -r \'define("JOBBY_RUN_JOB",1);include("%s");\' "%s" "%s"', $script, $job, http_build_query($config));
         }
 

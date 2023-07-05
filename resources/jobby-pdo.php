@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 //
 // This script demonstrates how to use jobby with a PDO-backend, which is used to
@@ -10,9 +11,9 @@
 // * * * * * cd /path/to/project && php jobby-pdo.php 1>> /dev/null 2>&1
 //
 
+use Jobby\Exception;
 use Jobby\Jobby;
 use Opis\Closure\SerializableClosure;
-use Jobby\Exception;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -67,10 +68,11 @@ $insertCronJobConfiguration->execute(
 // Second demo-job - a Closure which does some php::echo(). The Closure is saved to PDO-backend, too.
 $secondJobFn = static function (): bool {
     echo "I'm a function (" . date('Y-m-d H:i:s') . ')!' . PHP_EOL;
+
     return true;
 };
 
-$wrapper = new SerializableClosure($secondJobFn);
+$wrapper               = new SerializableClosure($secondJobFn);
 $secondJobFnSerialized = serialize($wrapper);
 $insertCronJobConfiguration->execute(
     ['ClosureExample', $secondJobFnSerialized, '* * * * *', 'logs/closure-pdo.log']
@@ -83,20 +85,20 @@ $insertCronJobConfiguration->execute(
  */
 
 $jobbiesStmt = $dbh->query("SELECT * FROM `$dbhJobbiesTableName` WHERE enabled = 1");
-$jobbies = $jobbiesStmt->fetchAll(PDO::FETCH_ASSOC);
+$jobbies     = $jobbiesStmt->fetchAll(PDO::FETCH_ASSOC);
 
 $jobby = new Jobby();
 
 foreach ($jobbies as $job) {
     // Filter out each value, which is not set (for example, "maxRuntime" is not defined in the job).
-    $job = array_filter($job);
+    $job            = array_filter($job);
     $job['closure'] = unserialize($job['command']);
-    $jobName = $job['name'];
+    $jobName        = $job['name'];
     unset($job['name']);
     try {
         $jobby->add($jobName, $job);
     } catch (Exception $e) {
-        die($e->getMessage());
+        exit($e->getMessage());
     }
 }
 

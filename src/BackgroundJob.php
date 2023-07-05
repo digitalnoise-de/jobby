@@ -1,8 +1,7 @@
 <?php
+declare(strict_types=1);
 
 namespace Jobby;
-
-use Throwable;
 
 class BackgroundJob
 {
@@ -22,7 +21,7 @@ class BackgroundJob
      */
     public function __construct(string $job, array $config, Helper $helper = null)
     {
-        $this->job = $job;
+        $this->job    = $job;
         $this->config = $config + [
             'recipients'     => null,
             'mailer'         => null,
@@ -147,7 +146,7 @@ class BackgroundJob
      */
     protected function getLogfile(string $output = 'stdout')
     {
-        $logfile = $this->config['output_'.$output];
+        $logfile = $this->config['output_' . $output];
         if (!is_string($logfile)) {
             return false;
         }
@@ -211,10 +210,10 @@ class BackgroundJob
         ob_start();
         try {
             $retval = $command();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             $logfile = $this->getLogfile('stderr');
             if ($logfile !== false) {
-                file_put_contents($logfile, "Error! " . $e->getMessage() . "\n", FILE_APPEND);
+                file_put_contents($logfile, 'Error! ' . $e->getMessage() . "\n", FILE_APPEND);
             }
             $retval = $e->getMessage();
         }
@@ -234,11 +233,11 @@ class BackgroundJob
     {
         // If job should run as another user, we must be on *nix and
         // must have sudo privileges.
-        $isUnix = ($this->helper->getPlatform() === Helper::UNIX);
+        $isUnix  = ($this->helper->getPlatform() === Helper::UNIX);
         $useSudo = '';
 
         if ($isUnix) {
-            $runAs = $this->config['runAs'];
+            $runAs  = $this->config['runAs'];
             $isRoot = (posix_getuid() === 0);
             if (!empty($runAs) && $isRoot) {
                 $useSudo = "sudo -u $runAs";
@@ -246,10 +245,10 @@ class BackgroundJob
         }
 
         // Start execution. Run in foreground (will block).
-        $command = $this->config['command'];
+        $command       = $this->config['command'];
         $stdoutLogfile = $this->getLogfile() ?: $this->helper->getSystemNullDevice();
         $stderrLogfile = $this->getLogfile('stderr') ?: $this->helper->getSystemNullDevice();
-        $command = "$useSudo $command 1>> \"$stdoutLogfile\" 2>> \"$stderrLogfile\"";
+        $command       = "$useSudo $command 1>> \"$stdoutLogfile\" 2>> \"$stderrLogfile\"";
 
         if (!$isUnix && $stdoutLogfile === $stderrLogfile) {
             $command = "$useSudo $command >> \"$stdoutLogfile\" 2>&1";

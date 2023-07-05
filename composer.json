@@ -22,6 +22,7 @@
     "symfony/process": "^2.7|^3.0|^4.0|^5.0"
   },
   "require-dev": {
+    "friendsofphp/php-cs-fixer": "^3.20",
     "mp091689/dump-die": "^1.0",
     "phpunit/phpunit": "^9.5",
     "psalm/plugin-phpunit": "^0.18.4",
