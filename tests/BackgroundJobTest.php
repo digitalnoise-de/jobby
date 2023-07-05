@@ -209,7 +209,7 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotSendMailOnMissingRecipients()
     {
-        $helper = $this->getMock('Jobby\Helper', ['sendMail']);
+        $helper = $this->createMock('Jobby\Helper');
         $helper->expects($this->never())
             ->method('sendMail')
         ;
@@ -230,7 +230,7 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
      */
     public function testMailShouldTriggerHelper()
     {
-        $helper = $this->getMock('Jobby\Helper', ['sendMail']);
+        $helper = $this->createPartialMock('Jobby\Helper', ['sendMail']);
         $helper->expects($this->once())
             ->method('sendMail')
         ;
@@ -255,7 +255,7 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped("'maxRuntime' is not supported on Windows");
         }
 
-        $helper = $this->getMock('Jobby\Helper', ['getLockLifetime']);
+        $helper = $this->createPartialMock('Jobby\Helper', ['getLockLifetime']);
         $helper->expects($this->once())
             ->method('getLockLifetime')
             ->will($this->returnValue(0))
@@ -281,7 +281,7 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped("'maxRuntime' is not supported on Windows");
         }
 
-        $helper = $this->getMock('Jobby\Helper', ['getLockLifetime']);
+        $helper = $this->createPartialMock('Jobby\Helper', ['getLockLifetime']);
         $helper->expects($this->once())
             ->method('getLockLifetime')
             ->will($this->returnValue(2))

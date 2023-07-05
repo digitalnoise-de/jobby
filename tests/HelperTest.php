@@ -295,9 +295,9 @@ class HelperTest extends \PHPUnit_Framework_TestCase
      */
     private function getSwiftMailerMock()
     {
-        $nullTransport = new \Swift_NullTransport();
-
-        return $this->getMock('Swift_Mailer', [], [$nullTransport]);
+        return $this->getMockBuilder('Swift_Mailer')
+            ->setConstructorArgs([new \Swift_NullTransport()])
+            ->getMock();
     }
 
     /**
@@ -306,7 +306,7 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     public function testItReturnsTheCorrectNullSystemDeviceForUnix()
     {
         /** @var Helper $helper */
-        $helper = $this->getMock("\\Jobby\\Helper", ["getPlatform"]);
+        $helper = $this->createPartialMock("\\Jobby\\Helper", ["getPlatform"]);
         $helper->expects($this->once())
             ->method("getPlatform")
             ->willReturn(Helper::UNIX);
@@ -320,7 +320,7 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     public function testItReturnsTheCorrectNullSystemDeviceForWindows()
     {
         /** @var Helper $helper */
-        $helper = $this->getMock("\\Jobby\\Helper", ["getPlatform"]);
+        $helper = $this->createPartialMock("\\Jobby\\Helper", ["getPlatform"]);
         $helper->expects($this->once())
                ->method("getPlatform")
                ->willReturn(Helper::WINDOWS);
