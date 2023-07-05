@@ -11,7 +11,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @coversDefaultClass Jobby\BackgroundJob
  */
-class BackgroundJobTest extends \PHPUnit\Framework\TestCase
+class BackgroundJobTest extends TestCase
 {
     public const JOB_NAME = 'name';
 

@@ -8,7 +8,7 @@ use Jobby\Exception;
 /**
  * @covers Jobby\Exception
  */
-class ExceptionTest extends \PHPUnit\Framework\TestCase
+class ExceptionTest extends TestCase
 {
     public function testInheritsBaseException()
     {

@@ -2,6 +2,8 @@
 
 namespace Jobby\Tests;
 
+use Jobby\Exception;
+use Jobby\InfoException;
 use PHPUnit\Framework\TestCase;
 use Countable;
 use Swift_Mailer;
@@ -12,7 +14,7 @@ use Jobby\Jobby;
 /**
  * @coversDefaultClass Jobby\Helper
  */
-class HelperTest extends \PHPUnit\Framework\TestCase
+class HelperTest extends TestCase
 {
     /**
      * @var Helper
@@ -187,19 +189,19 @@ class HelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @covers ::releaseLock
-     * @expectedException \Jobby\Exception
      */
     public function testReleaseNonExistin()
     {
+        $this->expectException(Exception::class);
         $this->helper->releaseLock($this->lockFile);
     }
 
     /**
      * @covers ::acquireLock
-     * @expectedException \Jobby\InfoException
      */
     public function testExceptionIfAquireFails()
     {
+        $this->expectException(InfoException::class);
         $fh = fopen($this->lockFile, 'r+');
         static::assertTrue(is_resource($fh));
 
@@ -211,10 +213,10 @@ class HelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @covers ::acquireLock
-     * @expectedException \Jobby\Exception
      */
     public function testAquireLockShouldFailOnSecondTry()
     {
+        $this->expectException(Exception::class);
         $this->helper->acquireLock($this->lockFile);
         $this->helper->acquireLock($this->lockFile);
     }

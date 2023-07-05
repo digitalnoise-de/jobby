@@ -6,7 +6,7 @@ use DateTimeImmutable;
 use Jobby\ScheduleChecker;
 use PHPUnit\Framework\TestCase;
 
-class ScheduleCheckerTest extends \PHPUnit\Framework\TestCase
+class ScheduleCheckerTest extends TestCase
 {
     /**
      * @var ScheduleChecker

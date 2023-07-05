@@ -2,6 +2,7 @@
 
 namespace Jobby\Tests;
 
+use Jobby\Exception;
 use PHPUnit\Framework\TestCase;
 use Jobby\Helper;
 use Jobby\Jobby;
@@ -10,7 +11,7 @@ use Opis\Closure\SerializableClosure;
 /**
  * @coversDefaultClass Jobby\Jobby
  */
-class JobbyTest extends \PHPUnit\Framework\TestCase
+class JobbyTest extends TestCase
 {
     /**
      * @var string
@@ -278,10 +279,10 @@ class JobbyTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @covers ::add
-     * @expectedException \Jobby\Exception
      */
     public function testExceptionOnMissingJobOptionCommand()
     {
+        $this->expectException(Exception::class);
         $jobby = new Jobby();
 
         $jobby->add(
@@ -294,10 +295,10 @@ class JobbyTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @covers ::add
-     * @expectedException \Jobby\Exception
      */
     public function testExceptionOnMissingJobOptionSchedule()
     {
+        $this->expectException(Exception::class);
         $jobby = new Jobby();
 
         $jobby->add(
