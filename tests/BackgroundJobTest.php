@@ -20,10 +20,7 @@ class BackgroundJobTest extends TestCase
      */
     private $logFile;
 
-    /**
-     * @var Helper
-     */
-    private $helper;
+    private Helper $helper;
 
     /**
      * {@inheritdoc}
@@ -118,9 +115,7 @@ class BackgroundJobTest extends TestCase
     {
         $this->runJob(
             [
-                'closure' => function () {
-                    return false;
-                },
+                'closure' => fn() => false,
             ]
         );
 
@@ -208,9 +203,7 @@ class BackgroundJobTest extends TestCase
 
         $this->runJob(
             [
-                'closure'    => function () {
-                    return false;
-                },
+                'closure'    => fn() => false,
                 'recipients' => '',
             ],
             $helper
@@ -229,9 +222,7 @@ class BackgroundJobTest extends TestCase
 
         $this->runJob(
             [
-                'closure'    => function () {
-                    return false;
-                },
+                'closure'    => fn() => false,
                 'recipients' => 'test@example.com',
             ],
             $helper

@@ -8,10 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class ScheduleCheckerTest extends TestCase
 {
-    /**
-     * @var ScheduleChecker
-     */
-    private $scheduleChecker;
+    private ScheduleChecker $scheduleChecker;
 
     /**
      * @return void
@@ -82,9 +79,7 @@ class ScheduleCheckerTest extends TestCase
      */
     public function test_it_can_use_a_closure_to_detect_a_due_job()
     {
-        static::assertTrue($this->scheduleChecker->isDue(function() {
-            return true;
-        }));
+        static::assertTrue($this->scheduleChecker->isDue(fn() => true));
     }
 
     /**
@@ -92,9 +87,7 @@ class ScheduleCheckerTest extends TestCase
      */
     public function test_it_can_use_a_closure_to_detect_a_non_due_job()
     {
-        static::assertFalse($this->scheduleChecker->isDue(function() {
-            return false;
-        }));
+        static::assertFalse($this->scheduleChecker->isDue(fn() => false));
     }
 
     /**

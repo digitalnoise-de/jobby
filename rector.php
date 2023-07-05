@@ -15,7 +15,7 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
 
     $rectorConfig->sets([
-        LevelSetList::UP_TO_PHP_72,
+        LevelSetList::UP_TO_PHP_74,
         PHPUnitSetList::PHPUNIT_70,
     ]);
 };

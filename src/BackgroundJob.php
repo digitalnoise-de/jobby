@@ -58,8 +58,8 @@ class BackgroundJob
             'debug'          => null,
         ];
 
-        $this->config['output_stdout'] = $this->config['output_stdout'] ?? $this->config['output'];
-        $this->config['output_stderr'] = $this->config['output_stderr'] ?? $this->config['output'];
+        $this->config['output_stdout'] ??= $this->config['output'];
+        $this->config['output_stderr'] ??= $this->config['output'];
 
         $this->helper = $helper ?: new Helper();
 

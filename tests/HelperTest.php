@@ -16,25 +16,13 @@ use Jobby\Jobby;
  */
 class HelperTest extends TestCase
 {
-    /**
-     * @var Helper
-     */
-    private $helper;
+    private Helper $helper;
 
-    /**
-     * @var string
-     */
-    private $tmpDir;
+    private string $tmpDir;
 
-    /**
-     * @var string
-     */
-    private $lockFile;
+    private string $lockFile;
 
-    /**
-     * @var string
-     */
-    private $copyOfLockFile;
+    private string $copyOfLockFile;
 
     /**
      * {@inheritdoc}
@@ -289,7 +277,7 @@ class HelperTest extends TestCase
         $email = "jobby@$host";
         static::assertContains('job', $mail->getSubject());
         static::assertContains("[$host]", $mail->getSubject());
-        static::assertEquals(1, is_array($mail->getFrom()) || $mail->getFrom() instanceof Countable ? count($mail->getFrom()) : 0);
+        static::assertEquals(1, is_countable($mail->getFrom()) ? count($mail->getFrom()) : 0);
         static::assertEquals('jobby', current($mail->getFrom()));
         static::assertEquals($email, current(array_keys($mail->getFrom())));
         static::assertEquals($email, current(array_keys($mail->getSender())));

@@ -22,12 +22,9 @@ class Helper
     /**
      * @var resource[]
      */
-    private $lockHandles = [];
+    private array $lockHandles = [];
 
-    /**
-     * @var Swift_Mailer
-     */
-    private $mailer;
+    private ?Swift_Mailer $mailer = null;
 
     /**
      * @param Swift_Mailer $mailer

@@ -18,10 +18,7 @@ class JobbyTest extends TestCase
      */
     private $logFile;
 
-    /**
-     * @var Helper
-     */
-    private $helper;
+    private Helper $helper;
 
     /**
      * {@inheritdoc}
@@ -321,9 +318,7 @@ class JobbyTest extends TestCase
         $jobby->add(
             'HelloWorldClosure',
             [
-                'command'  => function () {
-                    return true;
-                },
+                'command'  => fn() => true,
                 'schedule' => '* * * * *',
             ]
         );

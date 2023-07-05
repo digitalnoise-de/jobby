@@ -11,7 +11,7 @@ class ScheduleChecker
     /**
      * @var DateTimeImmutable|null
      */
-    private $now;
+    private DateTimeImmutable $now;
 
     public function __construct(DateTimeImmutable $now = null)
     {

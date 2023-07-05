@@ -15,7 +15,7 @@
     }
   ],
   "require": {
-    "php": "^7.2",
+    "php": "^7.4",
     "dragonmantank/cron-expression": "^3.0",
     "opis/closure": "^3.5",
     "swiftmailer/swiftmailer": "^5.4|^6.0",
