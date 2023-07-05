@@ -28,7 +28,7 @@ class ScheduleCheckerTest extends PHPUnit_Framework_TestCase
      */
     public function test_it_can_detect_a_due_job_from_a_datetime_string()
     {
-        $this->assertTrue($this->scheduleChecker->isDue(date('Y-m-d H:i:s')));
+        static::assertTrue($this->scheduleChecker->isDue(date('Y-m-d H:i:s')));
     }
 
     /**
@@ -38,8 +38,8 @@ class ScheduleCheckerTest extends PHPUnit_Framework_TestCase
     {
         $scheduleChecker = new ScheduleChecker(new DateTimeImmutable("2017-01-02 13:14:59"));
 
-        $this->assertTrue($scheduleChecker->isDue(date("2017-01-02 13:14:12")));
-        $this->assertFalse($scheduleChecker->isDue(date("2017-01-02 13:15:00")));
+        static::assertTrue($scheduleChecker->isDue(date("2017-01-02 13:14:12")));
+        static::assertFalse($scheduleChecker->isDue(date("2017-01-02 13:15:00")));
     }
 
     /**
@@ -47,7 +47,7 @@ class ScheduleCheckerTest extends PHPUnit_Framework_TestCase
      */
     public function test_it_can_detect_a_non_due_job_from_a_datetime_string()
     {
-        $this->assertFalse($this->scheduleChecker->isDue(date('Y-m-d H:i:s', strtotime('tomorrow'))));
+        static::assertFalse($this->scheduleChecker->isDue(date('Y-m-d H:i:s', strtotime('tomorrow'))));
     }
 
     /**
@@ -55,7 +55,7 @@ class ScheduleCheckerTest extends PHPUnit_Framework_TestCase
      */
     public function test_it_can_detect_a_due_job_from_a_cron_expression()
     {
-        $this->assertTrue($this->scheduleChecker->isDue("* * * * *"));
+        static::assertTrue($this->scheduleChecker->isDue("* * * * *"));
     }
 
     /**
@@ -65,7 +65,7 @@ class ScheduleCheckerTest extends PHPUnit_Framework_TestCase
     {
         $scheduleChecker = new ScheduleChecker(new DateTimeImmutable("2017-04-01 00:00:00"));
 
-        $this->assertTrue($scheduleChecker->isDue("0 0 1 */3 *"));
+        static::assertTrue($scheduleChecker->isDue("0 0 1 */3 *"));
     }
 
     /**
@@ -74,7 +74,7 @@ class ScheduleCheckerTest extends PHPUnit_Framework_TestCase
     public function test_it_can_detect_a_non_due_job_from_a_cron_expression()
     {
         $hour = date("H", strtotime('+1 hour'));
-        $this->assertFalse($this->scheduleChecker->isDue("* {$hour} * * *"));
+        static::assertFalse($this->scheduleChecker->isDue("* {$hour} * * *"));
     }
 
     /**
@@ -82,11 +82,9 @@ class ScheduleCheckerTest extends PHPUnit_Framework_TestCase
      */
     public function test_it_can_use_a_closure_to_detect_a_due_job()
     {
-        $this->assertTrue(
-            $this->scheduleChecker->isDue(function() {
-                return true;
-            })
-        );
+        static::assertTrue($this->scheduleChecker->isDue(function() {
+            return true;
+        }));
     }
 
     /**
@@ -94,11 +92,9 @@ class ScheduleCheckerTest extends PHPUnit_Framework_TestCase
      */
     public function test_it_can_use_a_closure_to_detect_a_non_due_job()
     {
-        $this->assertFalse(
-            $this->scheduleChecker->isDue(function() {
-                return false;
-            })
-        );
+        static::assertFalse($this->scheduleChecker->isDue(function() {
+            return false;
+        }));
     }
 
     /**
@@ -108,6 +104,6 @@ class ScheduleCheckerTest extends PHPUnit_Framework_TestCase
     {
         $scheduleChecker = new ScheduleChecker(new DateTimeImmutable("2017-01-02 18:14:59"));
 
-        $this->assertTrue($scheduleChecker->isDue("* 18 * * *"));
+        static::assertTrue($scheduleChecker->isDue("* 18 * * *"));
     }
 }

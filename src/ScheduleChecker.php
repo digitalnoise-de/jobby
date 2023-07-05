@@ -2,6 +2,7 @@
 
 namespace Jobby;
 
+use DateTime;
 use Cron\CronExpression;
 use DateTimeImmutable;
 
@@ -27,7 +28,7 @@ class ScheduleChecker
             return call_user_func($schedule, $this->now);
         }
 
-        $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', $schedule);
+        $dateTime = DateTime::createFromFormat('Y-m-d H:i:s', $schedule);
         if ($dateTime !== false) {
             return $dateTime->format('Y-m-d H:i') == $this->now->format('Y-m-d H:i');
         }

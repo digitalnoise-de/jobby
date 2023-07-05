@@ -2,6 +2,7 @@
 
 namespace Jobby;
 
+use Throwable;
 use Opis\Closure\SerializableClosure;
 
 class BackgroundJob
@@ -57,8 +58,8 @@ class BackgroundJob
             'debug'          => null,
         ];
 
-        $this->config['output_stdout'] = $this->config['output_stdout'] === null ? $this->config['output'] : $this->config['output_stdout'];
-        $this->config['output_stderr'] = $this->config['output_stderr'] === null ? $this->config['output'] : $this->config['output_stderr'];
+        $this->config['output_stdout'] = $this->config['output_stdout'] ?? $this->config['output'];
+        $this->config['output_stderr'] = $this->config['output_stderr'] ?? $this->config['output'];
 
         $this->helper = $helper ?: new Helper();
 
@@ -238,7 +239,7 @@ class BackgroundJob
         ob_start();
         try {
             $retval = $command();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if ($logfile = $this->getLogfile('stderr')) {
                 file_put_contents($this->getLogfile('stderr'), "Error! " . $e->getMessage() . "\n", FILE_APPEND);
             }

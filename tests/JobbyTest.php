@@ -2,6 +2,7 @@
 
 namespace Jobby\Tests;
 
+use PHPUnit_Framework_TestCase;
 use Jobby\Helper;
 use Jobby\Jobby;
 use Opis\Closure\SerializableClosure;
@@ -9,7 +10,7 @@ use Opis\Closure\SerializableClosure;
 /**
  * @coversDefaultClass Jobby\Jobby
  */
-class JobbyTest extends \PHPUnit_Framework_TestCase
+class JobbyTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @var string
@@ -64,7 +65,7 @@ class JobbyTest extends \PHPUnit_Framework_TestCase
         // Job runs asynchronously, so wait a bit
         sleep($this->getSleepTime());
 
-        $this->assertEquals('Hello World!', $this->getLogContent());
+        static::assertEquals('Hello World!', $this->getLogContent());
     }
 
     /**
@@ -87,10 +88,7 @@ class JobbyTest extends \PHPUnit_Framework_TestCase
         // Job runs asynchronously, so wait a bit
         sleep($this->getSleepTime());
 
-        $this->assertFalse(
-            file_exists($this->logFile),
-            "Failed to assert that log file doesn't exist and that background process did not spawn"
-        );
+        static::assertFalse(file_exists($this->logFile), "Failed to assert that log file doesn't exist and that background process did not spawn");
     }
 
     /**
@@ -124,7 +122,7 @@ class JobbyTest extends \PHPUnit_Framework_TestCase
         // Job runs asynchronously, so wait a bit
         sleep($this->getSleepTime());
 
-        $this->assertEquals('Another function!', $this->getLogContent());
+        static::assertEquals('Another function!', $this->getLogContent());
     }
 
     /**
@@ -151,7 +149,7 @@ class JobbyTest extends \PHPUnit_Framework_TestCase
         // Job runs asynchronously, so wait a bit
         sleep($this->getSleepTime());
 
-        $this->assertEquals('A function!', $this->getLogContent());
+        static::assertEquals('A function!', $this->getLogContent());
     }
 
     /**
@@ -188,8 +186,8 @@ class JobbyTest extends \PHPUnit_Framework_TestCase
         // Job runs asynchronously, so wait a bit
         sleep($this->getSleepTime());
 
-        $this->assertContains('job-1', $this->getLogContent());
-        $this->assertContains('job-2', $this->getLogContent());
+        static::assertContains('job-1', $this->getLogContent());
+        static::assertContains('job-2', $this->getLogContent());
     }
 
     /**
@@ -215,7 +213,7 @@ class JobbyTest extends \PHPUnit_Framework_TestCase
         // Job runs asynchronously, so wait a bit
         sleep($this->getSleepTime());
 
-        $this->assertEquals('A function!', $this->getLogContent());
+        static::assertEquals('A function!', $this->getLogContent());
     }
 
     /**
@@ -226,13 +224,13 @@ class JobbyTest extends \PHPUnit_Framework_TestCase
         $jobby = new Jobby();
         $config = $jobby->getDefaultConfig();
 
-        $this->assertNull($config['recipients']);
-        $this->assertEquals('sendmail', $config['mailer']);
-        $this->assertNull($config['runAs']);
-        $this->assertNull($config['output']);
-        $this->assertEquals('Y-m-d H:i:s', $config['dateFormat']);
-        $this->assertTrue($config['enabled']);
-        $this->assertFalse($config['debug']);
+        static::assertNull($config['recipients']);
+        static::assertEquals('sendmail', $config['mailer']);
+        static::assertNull($config['runAs']);
+        static::assertNull($config['output']);
+        static::assertEquals('Y-m-d H:i:s', $config['dateFormat']);
+        static::assertTrue($config['enabled']);
+        static::assertFalse($config['debug']);
     }
 
     /**
@@ -247,8 +245,8 @@ class JobbyTest extends \PHPUnit_Framework_TestCase
         $jobby->setConfig(['dateFormat' => 'foo bar']);
         $newCfg = $jobby->getConfig();
 
-        $this->assertEquals(count($oldCfg), count($newCfg));
-        $this->assertEquals('foo bar', $newCfg['dateFormat']);
+        static::assertEquals(count($oldCfg), count($newCfg));
+        static::assertEquals('foo bar', $newCfg['dateFormat']);
     }
 
     /**
@@ -257,7 +255,7 @@ class JobbyTest extends \PHPUnit_Framework_TestCase
     public function testGetJobs()
     {
         $jobby = new Jobby();
-        $this->assertCount(0,$jobby->getJobs());
+        static::assertCount(0, $jobby->getJobs());
         
         $jobby->add(
             'test job1',
@@ -275,7 +273,7 @@ class JobbyTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->assertCount(2,$jobby->getJobs());
+        static::assertCount(2, $jobby->getJobs());
     }
 
     /**
@@ -333,13 +331,13 @@ class JobbyTest extends \PHPUnit_Framework_TestCase
         $jobby->run();
         $duration = microtime(true) - $timeStart;
 
-        $this->assertLessThan(0.5, $duration);
+        static::assertLessThan(0.5, $duration);
     }
 
     public function testShouldFailIfMaxRuntimeExceeded()
     {
         if ($this->helper->getPlatform() === Helper::WINDOWS) {
-            $this->markTestSkipped("'maxRuntime' is not supported on Windows");
+            static::markTestSkipped("'maxRuntime' is not supported on Windows");
         }
 
         $jobby = new Jobby();
@@ -358,7 +356,7 @@ class JobbyTest extends \PHPUnit_Framework_TestCase
         $jobby->run();
         sleep(2);
 
-        $this->assertContains('ERROR: MaxRuntime of 1 secs exceeded!', $this->getLogContent());
+        static::assertContains('ERROR: MaxRuntime of 1 secs exceeded!', $this->getLogContent());
     }
 
     /**

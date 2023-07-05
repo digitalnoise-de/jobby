@@ -2,13 +2,17 @@
 
 namespace Jobby\Tests;
 
+use PHPUnit_Framework_TestCase;
+use Countable;
+use Swift_Mailer;
+use Swift_NullTransport;
 use Jobby\Helper;
 use Jobby\Jobby;
 
 /**
  * @coversDefaultClass Jobby\Helper
  */
-class HelperTest extends \PHPUnit_Framework_TestCase
+class HelperTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @var Helper
@@ -58,7 +62,7 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     public function testEscape($input, $expected)
     {
         $actual = $this->helper->escape($input);
-        $this->assertEquals($expected, $actual);
+        static::assertEquals($expected, $actual);
     }
 
     /**
@@ -82,7 +86,7 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     public function testGetPlatform()
     {
         $actual = $this->helper->getPlatform();
-        $this->assertContains($actual, [Helper::UNIX, Helper::WINDOWS]);
+        static::assertContains($actual, [Helper::UNIX, Helper::WINDOWS]);
     }
 
     /**
@@ -90,7 +94,7 @@ class HelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testPlatformConstants()
     {
-        $this->assertNotEquals(Helper::UNIX, Helper::WINDOWS);
+        static::assertNotEquals(Helper::UNIX, Helper::WINDOWS);
     }
 
     /**
@@ -122,10 +126,10 @@ class HelperTest extends \PHPUnit_Framework_TestCase
             $lockFile = $this->lockFile;
         }
 
-        $this->assertEquals(getmypid(), file_get_contents($lockFile));
+        static::assertEquals(getmypid(), file_get_contents($lockFile));
 
         $this->helper->releaseLock($this->lockFile);
-        $this->assertEmpty(file_get_contents($this->lockFile));
+        static::assertEmpty(file_get_contents($this->lockFile));
     }
 
     /**
@@ -134,8 +138,8 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     public function testLockLifetimeShouldBeZeroIfFileDoesNotExists()
     {
         unlink($this->lockFile);
-        $this->assertFalse(file_exists($this->lockFile));
-        $this->assertEquals(0, $this->helper->getLockLifetime($this->lockFile));
+        static::assertFalse(file_exists($this->lockFile));
+        static::assertEquals(0, $this->helper->getLockLifetime($this->lockFile));
     }
 
     /**
@@ -144,7 +148,7 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     public function testLockLifetimeShouldBeZeroIfFileIsEmpty()
     {
         file_put_contents($this->lockFile, '');
-        $this->assertEquals(0, $this->helper->getLockLifetime($this->lockFile));
+        static::assertEquals(0, $this->helper->getLockLifetime($this->lockFile));
     }
 
     /**
@@ -153,11 +157,11 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     public function testLockLifetimeShouldBeZeroIfItContainsAInvalidPid()
     {
         if ($this->helper->getPlatform() === Helper::WINDOWS) {
-            $this->markTestSkipped("Test relies on posix_ functions");
+            static::markTestSkipped("Test relies on posix_ functions");
         }
 
         file_put_contents($this->lockFile, 'invalid-pid');
-        $this->assertEquals(0, $this->helper->getLockLifetime($this->lockFile));
+        static::assertEquals(0, $this->helper->getLockLifetime($this->lockFile));
     }
 
     /**
@@ -166,16 +170,16 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     public function testGetLocklifetime()
     {
         if ($this->helper->getPlatform() === Helper::WINDOWS) {
-            $this->markTestSkipped("Test relies on posix_ functions");
+            static::markTestSkipped("Test relies on posix_ functions");
         }
 
         $this->helper->acquireLock($this->lockFile);
 
-        $this->assertEquals(0, $this->helper->getLockLifetime($this->lockFile));
+        static::assertEquals(0, $this->helper->getLockLifetime($this->lockFile));
         sleep(1);
-        $this->assertEquals(1, $this->helper->getLockLifetime($this->lockFile));
+        static::assertEquals(1, $this->helper->getLockLifetime($this->lockFile));
         sleep(1);
-        $this->assertEquals(2, $this->helper->getLockLifetime($this->lockFile));
+        static::assertEquals(2, $this->helper->getLockLifetime($this->lockFile));
 
         $this->helper->releaseLock($this->lockFile);
     }
@@ -196,10 +200,10 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     public function testExceptionIfAquireFails()
     {
         $fh = fopen($this->lockFile, 'r+');
-        $this->assertTrue(is_resource($fh));
+        static::assertTrue(is_resource($fh));
 
         $res = flock($fh, LOCK_EX | LOCK_NB);
-        $this->assertTrue($res);
+        static::assertTrue($res);
 
         $this->helper->acquireLock($this->lockFile);
     }
@@ -227,7 +231,7 @@ class HelperTest extends \PHPUnit_Framework_TestCase
         }
 
         $actual = $this->helper->getTempDir();
-        $this->assertContains($actual, $valid);
+        static::assertContains($actual, $valid);
     }
 
     /**
@@ -238,7 +242,7 @@ class HelperTest extends \PHPUnit_Framework_TestCase
         $_SERVER['APPLICATION_ENV'] = 'foo';
 
         $actual = $this->helper->getApplicationEnv();
-        $this->assertEquals('foo', $actual);
+        static::assertEquals('foo', $actual);
     }
 
     /**
@@ -247,7 +251,7 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     public function testGetApplicationEnvShouldBeNullIfUndefined()
     {
         $actual = $this->helper->getApplicationEnv();
-        $this->assertNull($actual);
+        static::assertNull($actual);
     }
 
     /**
@@ -256,7 +260,7 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     public function testGetHostname()
     {
         $actual = $this->helper->getHost();
-        $this->assertContains($actual, [gethostname(), php_uname('n')]);
+        static::assertContains($actual, [gethostname(), php_uname('n')]);
     }
 
     /**
@@ -266,7 +270,7 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     public function testSendMail()
     {
         $mailer = $this->getSwiftMailerMock();
-        $mailer->expects($this->once())
+        $mailer->expects(static::once())
             ->method('send')
         ;
 
@@ -280,23 +284,23 @@ class HelperTest extends \PHPUnit_Framework_TestCase
 
         $host = $helper->getHost();
         $email = "jobby@$host";
-        $this->assertContains('job', $mail->getSubject());
-        $this->assertContains("[$host]", $mail->getSubject());
-        $this->assertEquals(1, count($mail->getFrom()));
-        $this->assertEquals('jobby', current($mail->getFrom()));
-        $this->assertEquals($email, current(array_keys($mail->getFrom())));
-        $this->assertEquals($email, current(array_keys($mail->getSender())));
-        $this->assertContains($config['output'], $mail->getBody());
-        $this->assertContains('message', $mail->getBody());
+        static::assertContains('job', $mail->getSubject());
+        static::assertContains("[$host]", $mail->getSubject());
+        static::assertEquals(1, is_array($mail->getFrom()) || $mail->getFrom() instanceof Countable ? count($mail->getFrom()) : 0);
+        static::assertEquals('jobby', current($mail->getFrom()));
+        static::assertEquals($email, current(array_keys($mail->getFrom())));
+        static::assertEquals($email, current(array_keys($mail->getSender())));
+        static::assertContains($config['output'], $mail->getBody());
+        static::assertContains('message', $mail->getBody());
     }
 
     /**
-     * @return \Swift_Mailer
+     * @return Swift_Mailer
      */
     private function getSwiftMailerMock()
     {
         return $this->getMockBuilder('Swift_Mailer')
-            ->setConstructorArgs([new \Swift_NullTransport()])
+            ->setConstructorArgs([new Swift_NullTransport()])
             ->getMock();
     }
 
@@ -306,12 +310,12 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     public function testItReturnsTheCorrectNullSystemDeviceForUnix()
     {
         /** @var Helper $helper */
-        $helper = $this->createPartialMock("\\Jobby\\Helper", ["getPlatform"]);
-        $helper->expects($this->once())
+        $helper = $this->createPartialMock('\\' . Helper::class, ["getPlatform"]);
+        $helper->expects(static::once())
             ->method("getPlatform")
             ->willReturn(Helper::UNIX);
 
-        $this->assertEquals("/dev/null", $helper->getSystemNullDevice());
+        static::assertEquals("/dev/null", $helper->getSystemNullDevice());
     }
 
     /**
@@ -320,11 +324,11 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     public function testItReturnsTheCorrectNullSystemDeviceForWindows()
     {
         /** @var Helper $helper */
-        $helper = $this->createPartialMock("\\Jobby\\Helper", ["getPlatform"]);
-        $helper->expects($this->once())
+        $helper = $this->createPartialMock('\\' . Helper::class, ["getPlatform"]);
+        $helper->expects(static::once())
                ->method("getPlatform")
                ->willReturn(Helper::WINDOWS);
 
-        $this->assertEquals("NUL", $helper->getSystemNullDevice());
+        static::assertEquals("NUL", $helper->getSystemNullDevice());
     }
 }

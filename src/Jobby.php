@@ -58,7 +58,7 @@ class Jobby
     public function getDefaultConfig()
     {
         return [
-            'jobClass'       => 'Jobby\BackgroundJob',
+            'jobClass'       => BackgroundJob::class,
             'recipients'     => null,
             'mailer'         => 'sendmail',
             'maxRuntime'     => null,
@@ -155,7 +155,7 @@ class Jobby
 
         $scheduleChecker = new ScheduleChecker(new DateTimeImmutable("now"));
         foreach ($this->jobs as $jobConfig) {
-            list($job, $config) = $jobConfig;
+            [$job, $config] = $jobConfig;
             if (!$scheduleChecker->isDue($config['schedule'])) {
                 continue;
             }

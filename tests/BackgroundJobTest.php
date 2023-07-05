@@ -2,6 +2,7 @@
 
 namespace Jobby\Tests;
 
+use PHPUnit_Framework_TestCase;
 use Jobby\BackgroundJob;
 use Jobby\Helper;
 use Opis\Closure\SerializableClosure;
@@ -10,9 +11,9 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @coversDefaultClass Jobby\BackgroundJob
  */
-class BackgroundJobTest extends \PHPUnit_Framework_TestCase
+class BackgroundJobTest extends PHPUnit_Framework_TestCase
 {
-    const JOB_NAME = 'name';
+    public const JOB_NAME = 'name';
 
     /**
      * @var string
@@ -75,7 +76,7 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
     public function testGetConfig()
     {
         $job = new BackgroundJob('test job',[]);
-        $this->assertInternalType('array',$job->getConfig());
+        static::assertInternalType('array', $job->getConfig());
     }
 
     /**
@@ -90,7 +91,7 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
     {
         $this->runJob($config);
 
-        $this->assertEquals($expectedOutput, $this->getLogContent());
+        static::assertEquals($expectedOutput, $this->getLogContent());
     }
 
     /**
@@ -100,19 +101,13 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
     {
         $this->runJob(['command' => 'invalid-command']);
 
-        $this->assertContains('invalid-command', $this->getLogContent());
+        static::assertContains('invalid-command', $this->getLogContent());
 
         if ($this->helper->getPlatform() === Helper::UNIX) {
-            $this->assertContains('not found', $this->getLogContent());
-            $this->assertContains(
-                "ERROR: Job exited with status '127'",
-                $this->getLogContent()
-            );
+            static::assertContains('not found', $this->getLogContent());
+            static::assertContains("ERROR: Job exited with status '127'", $this->getLogContent());
         } else {
-            $this->assertContains(
-                'not recognized as an internal or external command',
-                $this->getLogContent()
-            );
+            static::assertContains('not recognized as an internal or external command', $this->getLogContent());
         }
     }
 
@@ -129,10 +124,7 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->assertContains(
-            'ERROR: Closure did not return true! Returned:',
-            $this->getLogContent()
-        );
+        static::assertContains('ERROR: Closure did not return true! Returned:', $this->getLogContent());
     }
 
     /**
@@ -152,7 +144,7 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertEmpty($content);
+        static::assertEmpty($content);
     }
 
     /**
@@ -176,8 +168,8 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
         unlink($logfile);
         rmdir(dirname($logfile));
 
-        $this->assertTrue($dirExists);
-        $this->assertTrue($isDir);
+        static::assertTrue($dirExists);
+        static::assertTrue($isDir);
     }
 
     /**
@@ -196,8 +188,8 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->assertContains('stdout output', @file_get_contents($stdout));
-        $this->assertContains('stderr output', @file_get_contents($stderr));
+        static::assertContains('stdout output', @file_get_contents($stdout));
+        static::assertContains('stderr output', @file_get_contents($stderr));
 
         unlink($stderr);
         unlink($stdout);
@@ -209,8 +201,8 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotSendMailOnMissingRecipients()
     {
-        $helper = $this->createMock('Jobby\Helper');
-        $helper->expects($this->never())
+        $helper = $this->createMock(Helper::class);
+        $helper->expects(static::never())
             ->method('sendMail')
         ;
 
@@ -230,8 +222,8 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
      */
     public function testMailShouldTriggerHelper()
     {
-        $helper = $this->createPartialMock('Jobby\Helper', ['sendMail']);
-        $helper->expects($this->once())
+        $helper = $this->createPartialMock(Helper::class, ['sendMail']);
+        $helper->expects(static::once())
             ->method('sendMail')
         ;
 
@@ -252,13 +244,13 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
     public function testCheckMaxRuntime()
     {
         if ($this->helper->getPlatform() !== Helper::UNIX) {
-            $this->markTestSkipped("'maxRuntime' is not supported on Windows");
+            static::markTestSkipped("'maxRuntime' is not supported on Windows");
         }
 
-        $helper = $this->createPartialMock('Jobby\Helper', ['getLockLifetime']);
-        $helper->expects($this->once())
+        $helper = $this->createPartialMock(Helper::class, ['getLockLifetime']);
+        $helper->expects(static::once())
             ->method('getLockLifetime')
-            ->will($this->returnValue(0))
+            ->will(static::returnValue(0))
         ;
 
         $this->runJob(
@@ -269,7 +261,7 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
             $helper
         );
 
-        $this->assertEmpty($this->getLogContent());
+        static::assertEmpty($this->getLogContent());
     }
 
     /**
@@ -278,13 +270,13 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
     public function testCheckMaxRuntimeShouldFailIsExceeded()
     {
         if ($this->helper->getPlatform() !== Helper::UNIX) {
-            $this->markTestSkipped("'maxRuntime' is not supported on Windows");
+            static::markTestSkipped("'maxRuntime' is not supported on Windows");
         }
 
-        $helper = $this->createPartialMock('Jobby\Helper', ['getLockLifetime']);
-        $helper->expects($this->once())
+        $helper = $this->createPartialMock(Helper::class, ['getLockLifetime']);
+        $helper->expects(static::once())
             ->method('getLockLifetime')
-            ->will($this->returnValue(2))
+            ->will(static::returnValue(2))
         ;
 
         $this->runJob(
@@ -295,10 +287,7 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
             $helper
         );
 
-        $this->assertContains(
-            'MaxRuntime of 1 secs exceeded! Current runtime: 2 secs',
-            $this->getLogContent()
-        );
+        static::assertContains('MaxRuntime of 1 secs exceeded! Current runtime: 2 secs', $this->getLogContent());
     }
 
     /**
@@ -335,7 +324,7 @@ class BackgroundJobTest extends \PHPUnit_Framework_TestCase
         }
 
         $content = $this->getLogContent();
-        $this->assertEquals($jobRuns, is_string($content) && !empty($content));
+        static::assertEquals($jobRuns, is_string($content) && !empty($content));
     }
 
     public function haltDirProvider()

@@ -1,5 +1,6 @@
 <?php
 
+use Jobby\Jobby;
 //
 // Add this line to your crontab file:
 //
@@ -8,23 +9,13 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$jobby = new \Jobby\Jobby();
+$jobby = new Jobby();
 
-$jobby->add('CommandExample', array(
-    'command' => 'ls',
-    'schedule' => '* * * * *',
-    'output' => 'logs/command.log',
-    'enabled' => true,
-));
+$jobby->add('CommandExample', ['command' => 'ls', 'schedule' => '* * * * *', 'output' => 'logs/command.log', 'enabled' => true]);
 
-$jobby->add('ClosureExample', array(
-    'command' => function() {
-        echo "I'm a function!\n";
-        return true;
-    },
-    'schedule' => '* * * * *',
-    'output' => 'logs/closure.log',
-    'enabled' => true,
-));
+$jobby->add('ClosureExample', ['command' => function() {
+    echo "I'm a function!\n";
+    return true;
+}, 'schedule' => '* * * * *', 'output' => 'logs/closure.log', 'enabled' => true]);
 
 $jobby->run();
