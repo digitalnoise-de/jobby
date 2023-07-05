@@ -10,7 +10,7 @@ use Jobby\Exception;
  */
 class ExceptionTest extends TestCase
 {
-    public function testInheritsBaseException()
+    public function testInheritsBaseException(): void
     {
         $e = new Exception();
         static::assertTrue($e instanceof \Exception);

@@ -8,21 +8,17 @@ use DateTimeImmutable;
 
 class ScheduleChecker
 {
-    /**
-     * @var DateTimeImmutable|null
-     */
     private DateTimeImmutable $now;
 
     public function __construct(DateTimeImmutable $now = null)
     {
-        $this->now = $now instanceof DateTimeImmutable ? $now : new DateTimeImmutable("now");
+        $this->now = $now ?? new DateTimeImmutable("now");
     }
 
     /**
-     * @param string|callable $schedule
-     * @return bool
+     * @param string|callable(DateTimeImmutable):bool $schedule
      */
-    public function isDue($schedule)
+    public function isDue($schedule): bool
     {
         if (is_callable($schedule)) {
             return call_user_func($schedule, $this->now);
@@ -33,6 +29,6 @@ class ScheduleChecker
             return $dateTime->format('Y-m-d H:i') == $this->now->format('Y-m-d H:i');
         }
 
-        return CronExpression::factory((string)$schedule)->isDue($this->now);
+        return CronExpression::factory($schedule)->isDue($this->now);
     }
 }

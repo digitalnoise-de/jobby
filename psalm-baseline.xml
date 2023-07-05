@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="5.13.1@086b94371304750d1c673315321a55d15fc59015">
+  <file src="resources/jobby-pdo.php">
+    <MixedArgument>
+      <code>$job</code>
+      <code>$jobName</code>
+      <code>$job['command']</code>
+    </MixedArgument>
+    <MixedArgumentTypeCoercion>
+      <code>$job</code>
+    </MixedArgumentTypeCoercion>
+    <MixedAssignment>
+      <code>$job</code>
+      <code>$jobName</code>
+      <code>$job['closure']</code>
+    </MixedAssignment>
+  </file>
+  <file src="src/BackgroundJob.php">
+    <MixedArgument>
+      <code><![CDATA[$this->config['closure']]]></code>
+      <code><![CDATA[$this->config['dateFormat']]]></code>
+      <code><![CDATA[$this->config['environment']]]></code>
+      <code><![CDATA[$this->config['runOnHost']]]></code>
+    </MixedArgument>
+    <MixedAssignment>
+      <code>$command</code>
+      <code>$command</code>
+      <code>$haltDir</code>
+      <code>$maxRuntime</code>
+      <code>$runAs</code>
+    </MixedAssignment>
+    <MixedFunctionCall>
+      <code>$command()</code>
+    </MixedFunctionCall>
+    <MixedOperand>
+      <code>$haltDir</code>
+    </MixedOperand>
+    <PossiblyUndefinedArrayOffset>
+      <code>$_SERVER['REQUEST_TIME']</code>
+    </PossiblyUndefinedArrayOffset>
+  </file>
+  <file src="src/Helper.php">
+    <InvalidScalarArgument>
+      <code>getmypid()</code>
+    </InvalidScalarArgument>
+    <MixedArgument>
+      <code>$config['recipients']</code>
+      <code>$config['smtpHost']</code>
+      <code>$config['smtpPassword']</code>
+      <code>$config['smtpPort']</code>
+      <code>$config['smtpSecurity']</code>
+      <code>$config['smtpSender']</code>
+      <code>$config['smtpUsername']</code>
+    </MixedArgument>
+    <MixedArrayOffset>
+      <code><![CDATA[[$config['smtpSender'] => $config['smtpSenderName']]]]></code>
+    </MixedArrayOffset>
+    <MixedInferredReturnType>
+      <code>Swift_Mailer</code>
+    </MixedInferredReturnType>
+    <RedundantConditionGivenDocblockType>
+      <code><![CDATA[$this->lockHandles[$lockFile]]]></code>
+    </RedundantConditionGivenDocblockType>
+    <UndefinedClass>
+      <code>Swift_MailTransport</code>
+    </UndefinedClass>
+  </file>
+  <file src="src/Jobby.php">
+    <MixedArgument>
+      <code>$config['closure']</code>
+      <code>$config['schedule']</code>
+    </MixedArgument>
+  </file>
+  <file src="src/ScheduleChecker.php">
+    <DeprecatedMethod>
+      <code>CronExpression::factory($schedule)</code>
+    </DeprecatedMethod>
+  </file>
+  <file src="tests/BackgroundJobTest.php">
+    <MixedArgument>
+      <code>$config['closure']</code>
+    </MixedArgument>
+    <MixedOperand>
+      <code>static::JOB_NAME</code>
+    </MixedOperand>
+    <PossiblyFalseArgument>
+      <code><![CDATA[$this->getLogContent()]]></code>
+    </PossiblyFalseArgument>
+  </file>
+  <file src="tests/ExceptionTest.php">
+    <RedundantCondition>
+      <code>assertTrue</code>
+    </RedundantCondition>
+  </file>
+  <file src="tests/HelperTest.php">
+    <InvalidArgument>
+      <code><![CDATA[$mail->getSender()]]></code>
+    </InvalidArgument>
+    <MixedArgument>
+      <code><![CDATA[$mail->getFrom()]]></code>
+      <code><![CDATA[$mail->getFrom()]]></code>
+      <code><![CDATA[$mail->getFrom()]]></code>
+    </MixedArgument>
+  </file>
+  <file src="tests/JobbyTest.php">
+    <MixedAssignment>
+      <code>$closure</code>
+      <code>$wrapper</code>
+    </MixedAssignment>
+    <MixedMethodCall>
+      <code>getClosure</code>
+    </MixedMethodCall>
+  </file>
+</files>

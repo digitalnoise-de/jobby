@@ -45,14 +45,17 @@ class BackgroundJobTest extends TestCase
         }
     }
 
-    public function runProvider()
+    /**
+     * @return array<string, array{0: array<string, mixed>, 1: string|int}>
+     */
+    public function runProvider(): array
     {
-        $echo = function () {
+        $echo = static function (): bool {
             echo 'test';
 
             return true;
         };
-        $uid = function () {
+        $uid = static function (): bool {
             echo getmyuid();
 
             return true;
@@ -61,7 +64,7 @@ class BackgroundJobTest extends TestCase
 
         return [
             'diabled, not run'       => [$job + ['enabled' => false], ''],
-            'normal job, run'         => [$job, 'test'],
+            'normal job, run'        => [$job, 'test'],
             'wrong host, not run'    => [$job + ['runOnHost' => 'something that does not match'], ''],
             'current user, run,'     => [['closure' => $uid], getmyuid()],
         ];
@@ -70,7 +73,7 @@ class BackgroundJobTest extends TestCase
     /**
      * @covers ::getConfig
      */
-    public function testGetConfig()
+    public function testGetConfig(): void
     {
         $job = new BackgroundJob('test job',[]);
         static::assertIsArray($job->getConfig());
@@ -81,10 +84,10 @@ class BackgroundJobTest extends TestCase
      *
      * @covers ::run
      *
-     * @param array  $config
-     * @param string $expectedOutput
+     * @param array<string, mixed> $config
+     * @param string|int           $expectedOutput
      */
-    public function testRun($config, $expectedOutput)
+    public function testRun(array $config, $expectedOutput): void
     {
         $this->runJob($config);
 
@@ -94,24 +97,24 @@ class BackgroundJobTest extends TestCase
     /**
      * @covers ::runFile
      */
-    public function testInvalidCommand()
+    public function testInvalidCommand(): void
     {
         $this->runJob(['command' => 'invalid-command']);
 
-        static::assertStringContainsString('invalid-command', $this->getLogContent());
+        static::assertStringContainsString('invalid-command', (string)$this->getLogContent());
 
         if ($this->helper->getPlatform() === Helper::UNIX) {
-            static::assertStringContainsString('not found', $this->getLogContent());
+            static::assertStringContainsString('not found', (string)$this->getLogContent());
             static::assertStringContainsString("ERROR: Job exited with status '127'", $this->getLogContent());
         } else {
-            static::assertStringContainsString('not recognized as an internal or external command', $this->getLogContent());
+            static::assertStringContainsString('not recognized as an internal or external command', (string)$this->getLogContent());
         }
     }
 
     /**
      * @covers ::runFunction
      */
-    public function testClosureNotReturnTrue()
+    public function testClosureNotReturnTrue(): void
     {
         $this->runJob(
             [
@@ -119,13 +122,13 @@ class BackgroundJobTest extends TestCase
             ]
         );
 
-        static::assertStringContainsString('ERROR: Closure did not return true! Returned:', $this->getLogContent());
+        static::assertStringContainsString('ERROR: Closure did not return true! Returned:', (string)$this->getLogContent());
     }
 
     /**
      * @covers ::getLogFile
      */
-    public function testHideStdOutByDefault()
+    public function testHideStdOutByDefault(): void
     {
         ob_start();
         $this->runJob(
@@ -145,7 +148,7 @@ class BackgroundJobTest extends TestCase
     /**
      * @covers ::getLogFile
      */
-    public function testShouldCreateLogFolder()
+    public function testShouldCreateLogFolder(): void
     {
         $logfile = dirname($this->logFile) . '/foo/bar.log';
         $this->runJob(
@@ -170,7 +173,7 @@ class BackgroundJobTest extends TestCase
     /**
      * @covers ::getLogFile
      */
-    public function testShouldSplitStderrAndStdout()
+    public function testShouldSplitStderrAndStdout(): void
     {
         $dirname = dirname($this->logFile);
         $stdout = $dirname . '/stdout.log';
@@ -194,7 +197,7 @@ class BackgroundJobTest extends TestCase
     /**
      * @covers ::mail
      */
-    public function testNotSendMailOnMissingRecipients()
+    public function testNotSendMailOnMissingRecipients(): void
     {
         $helper = $this->createMock(Helper::class);
         $helper->expects(static::never())
@@ -213,7 +216,7 @@ class BackgroundJobTest extends TestCase
     /**
      * @covers ::mail
      */
-    public function testMailShouldTriggerHelper()
+    public function testMailShouldTriggerHelper(): void
     {
         $helper = $this->createPartialMock(Helper::class, ['sendMail']);
         $helper->expects(static::once())
@@ -232,7 +235,7 @@ class BackgroundJobTest extends TestCase
     /**
      * @covers ::checkMaxRuntime
      */
-    public function testCheckMaxRuntime()
+    public function testCheckMaxRuntime(): void
     {
         if ($this->helper->getPlatform() !== Helper::UNIX) {
             static::markTestSkipped("'maxRuntime' is not supported on Windows");
@@ -258,7 +261,7 @@ class BackgroundJobTest extends TestCase
     /**
      * @covers ::checkMaxRuntime
      */
-    public function testCheckMaxRuntimeShouldFailIsExceeded()
+    public function testCheckMaxRuntimeShouldFailIsExceeded(): void
     {
         if ($this->helper->getPlatform() !== Helper::UNIX) {
             static::markTestSkipped("'maxRuntime' is not supported on Windows");
@@ -278,7 +281,7 @@ class BackgroundJobTest extends TestCase
             $helper
         );
 
-        static::assertStringContainsString('MaxRuntime of 1 secs exceeded! Current runtime: 2 secs', $this->getLogContent());
+        static::assertStringContainsString('MaxRuntime of 1 secs exceeded! Current runtime: 2 secs', (string)$this->getLogContent());
     }
 
     /**
@@ -288,7 +291,7 @@ class BackgroundJobTest extends TestCase
      * @param bool $createFile
      * @param bool $jobRuns
      */
-    public function testHaltDir($createFile, $jobRuns)
+    public function testHaltDir(bool $createFile, bool $jobRuns): void
     {
         $dir = __DIR__ . '/_files';
         $file = $dir . '/' . static::JOB_NAME;
@@ -318,7 +321,10 @@ class BackgroundJobTest extends TestCase
         static::assertEquals($jobRuns, is_string($content) && !empty($content));
     }
 
-    public function haltDirProvider()
+    /**
+     * @return list<array{0: bool, 1: bool}>
+     */
+    public function haltDirProvider(): array
     {
         return [
             [true, false],
@@ -327,10 +333,9 @@ class BackgroundJobTest extends TestCase
     }
 
     /**
-     * @param array  $config
-     * @param Helper $helper
+     * @param array<string, mixed> $config
      */
-    private function runJob(array $config, Helper $helper = null)
+    private function runJob(array $config, Helper $helper = null): void
     {
         $config = $this->getJobConfig($config);
 
@@ -339,11 +344,11 @@ class BackgroundJobTest extends TestCase
     }
 
     /**
-     * @param array $config
+     * @param array<string, mixed> $config
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    private function getJobConfig(array $config)
+    private function getJobConfig(array $config): array
     {
         $helper = new Helper();
 
@@ -368,7 +373,7 @@ class BackgroundJobTest extends TestCase
     }
 
     /**
-     * @return string
+     * @return string|false
      */
     private function getLogContent()
     {

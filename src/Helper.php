@@ -96,12 +96,10 @@ EOF;
     }
 
     /**
-     * @param string $lockFile
-     *
      * @throws Exception
      * @throws InfoException
      */
-    public function acquireLock($lockFile)
+    public function acquireLock(string $lockFile): void
     {
         if (array_key_exists($lockFile, $this->lockHandles)) {
             throw new Exception("Lock already acquired (Lockfile: $lockFile).");
@@ -133,11 +131,9 @@ EOF;
     }
 
     /**
-     * @param string $lockFile
-     *
      * @throws Exception
      */
-    public function releaseLock($lockFile)
+    public function releaseLock(string $lockFile): void
     {
         if (!array_key_exists($lockFile, $this->lockHandles)) {
             throw new Exception("Lock NOT held - bug? Lockfile: $lockFile");
@@ -151,12 +147,7 @@ EOF;
         unset($this->lockHandles[$lockFile]);
     }
 
-    /**
-     * @param string $lockFile
-     *
-     * @return int
-     */
-    public function getLockLifetime($lockFile)
+    public function getLockLifetime(string $lockFile): int
     {
         if (!file_exists($lockFile)) {
             return 0;
@@ -176,10 +167,7 @@ EOF;
         return (time() - $stat['mtime']);
     }
 
-    /**
-     * @return string
-     */
-    public function getTempDir()
+    public function getTempDir(): string
     {
         // @codeCoverageIgnoreStart
         if (function_exists('sys_get_temp_dir')) {
@@ -198,26 +186,17 @@ EOF;
         return $tmp;
     }
 
-    /**
-     * @return string
-     */
-    public function getHost()
+    public function getHost(): string
     {
         return php_uname('n');
     }
 
-    /**
-     * @return string|null
-     */
-    public function getApplicationEnv()
+    public function getApplicationEnv(): ?string
     {
         return $_SERVER['APPLICATION_ENV'] ?? null;
     }
 
-    /**
-     * @return int
-     */
-    public function getPlatform()
+    public function getPlatform(): int
     {
         if (strncasecmp(PHP_OS, 'Win', 3) === 0) {
             // @codeCoverageIgnoreStart
@@ -228,12 +207,7 @@ EOF;
         return self::UNIX;
     }
 
-    /**
-     * @param string $input
-     *
-     * @return string
-     */
-    public function escape($input)
+    public function escape(string $input): string
     {
         $input = strtolower($input);
         $input = preg_replace('/[^a-z0-9_. -]+/', '', $input);
@@ -244,7 +218,7 @@ EOF;
         return $input;
     }
 
-    public function getSystemNullDevice()
+    public function getSystemNullDevice(): string
     {
         $platform = $this->getPlatform();
         if ($platform === self::UNIX) {

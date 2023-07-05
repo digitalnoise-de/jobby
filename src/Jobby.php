@@ -10,27 +10,21 @@ use Symfony\Component\Process\PhpExecutableFinder;
 class Jobby
 {
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $config = [];
+    protected array $config = [];
+
+    protected string $script;
 
     /**
-     * @var string
+     * @var list<array{0: string, 1: array<string, mixed>}>
      */
-    protected $script;
+    protected array $jobs = [];
+
+    protected ?Helper $helper = null;
 
     /**
-     * @var array
-     */
-    protected $jobs = [];
-
-    /**
-     * @var Helper
-     */
-    protected $helper;
-
-    /**
-     * @param array $config
+     * @param array<string, mixed> $config
      */
     public function __construct(array $config = [])
     {
@@ -40,10 +34,7 @@ class Jobby
         $this->script = realpath(__DIR__ . '/../bin/run-job');
     }
 
-    /**
-     * @return Helper
-     */
-    protected function getHelper()
+    protected function getHelper(): Helper
     {
         if ($this->helper === null) {
             $this->helper = new Helper();
@@ -53,9 +44,9 @@ class Jobby
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getDefaultConfig()
+    public function getDefaultConfig(): array
     {
         return [
             'jobClass'       => BackgroundJob::class,
@@ -83,17 +74,17 @@ class Jobby
     }
 
     /**
-     * @param array
+     * @param array<string, mixed> $config
      */
-    public function setConfig(array $config)
+    public function setConfig(array $config): void
     {
         $this->config = array_merge($this->config, $config);
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getConfig()
+    public function getConfig(): array
     {
         return $this->config;
     }
@@ -109,12 +100,11 @@ class Jobby
     /**
      * Add a job.
      *
-     * @param string $job
-     * @param array  $config
+     * @param array<string, mixed>  $config
      *
      * @throws Exception
      */
-    public function add($job, array $config)
+    public function add(string $job, array $config): void
     {
         if (empty($config['schedule'])) {
             throw new Exception("'schedule' is required for '$job' job");
@@ -145,9 +135,9 @@ class Jobby
     /**
      * Run all jobs.
      */
-    public function run()
+    public function run(): void
     {
-        $isUnix = ($this->helper->getPlatform() === Helper::UNIX);
+        $isUnix = ($this->getHelper()->getPlatform() === Helper::UNIX);
 
         if ($isUnix && !extension_loaded('posix')) {
             throw new Exception('posix extension is required');
@@ -168,10 +158,9 @@ class Jobby
     }
 
     /**
-     * @param string $job
-     * @param array  $config
+     * @param array<string, mixed> $config
      */
-    protected function runUnix($job, array $config)
+    protected function runUnix(string $job, array $config): void
     {
         $command = $this->getExecutableCommand($job, $config);
         $binary = $this->getPhpBinary();
@@ -182,10 +171,9 @@ class Jobby
 
     // @codeCoverageIgnoreStart
     /**
-     * @param string $job
-     * @param array  $config
+     * @param array<string, mixed> $config
      */
-    protected function runWindows($job, array $config)
+    protected function runWindows(string $job, array $config): void
     {
         // Run in background (non-blocking). From
         // http://us3.php.net/manual/en/function.exec.php#43834

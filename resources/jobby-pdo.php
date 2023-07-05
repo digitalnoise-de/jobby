@@ -65,7 +65,7 @@ $insertCronJobConfiguration->execute(
     ['CommandExample', 'date', '* * * * *', 'logs/command-pdo.log']
 );
 // Second demo-job - a Closure which does some php::echo(). The Closure is saved to PDO-backend, too.
-$secondJobFn = static function () {
+$secondJobFn = static function (): bool {
     echo "I'm a function (" . date('Y-m-d H:i:s') . ')!' . PHP_EOL;
     return true;
 };

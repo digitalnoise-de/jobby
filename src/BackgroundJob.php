@@ -3,36 +3,24 @@
 namespace Jobby;
 
 use Throwable;
-use Opis\Closure\SerializableClosure;
 
 class BackgroundJob
 {
-    /**
-     * @var Helper
-     */
-    protected $helper;
+    protected Helper $helper;
+
+    protected string $job;
+
+    protected string $tmpDir;
 
     /**
-     * @var string
+     * @var array<string, mixed>
      */
-    protected $job;
+    protected array $config;
 
     /**
-     * @var string
+     * @param array<string, mixed> $config
      */
-    protected $tmpDir;
-
-    /**
-     * @var array
-     */
-    protected $config;
-
-    /**
-     * @param string $job
-     * @param array  $config
-     * @param Helper $helper
-     */
-    public function __construct($job, array $config, Helper $helper = null)
+    public function __construct(string $job, array $config, Helper $helper = null)
     {
         $this->job = $job;
         $this->config = $config + [
@@ -66,7 +54,7 @@ class BackgroundJob
         $this->tmpDir = $this->helper->getTempDir();
     }
 
-    public function run()
+    public function run(): void
     {
         $lockFile = $this->getLockFile();
 
@@ -105,26 +93,24 @@ class BackgroundJob
 
             // remove log file if empty
             $logfile = $this->getLogfile();
-            if (is_file($logfile) && filesize($logfile) <= 0) {
+            if ($logfile !== false && is_file($logfile) && filesize($logfile) <= 0) {
                 unlink($logfile);
             }
         }
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getConfig()
+    public function getConfig(): array
     {
         return $this->config;
     }
 
     /**
-     * @param string $lockFile
-     *
      * @throws Exception
      */
-    protected function checkMaxRuntime($lockFile)
+    protected function checkMaxRuntime(string $lockFile): void
     {
         $maxRuntime = $this->config['maxRuntime'];
         if ($maxRuntime === null) {
@@ -143,10 +129,7 @@ class BackgroundJob
         throw new Exception("MaxRuntime of $maxRuntime secs exceeded! Current runtime: $runtime secs");
     }
 
-    /**
-     * @param string $message
-     */
-    protected function mail($message)
+    protected function mail(string $message): void
     {
         if (empty($this->config['recipients'])) {
             return;
@@ -160,16 +143,14 @@ class BackgroundJob
     }
 
     /**
-     * @param string $output
-     * @return string
+     * @return string|false
      */
-    protected function getLogfile($output = 'stdout')
+    protected function getLogfile(string $output = 'stdout')
     {
         $logfile = $this->config['output_'.$output];
-        if ($logfile === null) {
+        if (!is_string($logfile)) {
             return false;
         }
-
 
         $logs = dirname($logfile);
         if (!file_exists($logs)) {
@@ -179,10 +160,7 @@ class BackgroundJob
         return $logfile;
     }
 
-    /**
-     * @return string
-     */
-    protected function getLockFile()
+    protected function getLockFile(): string
     {
         $tmp = $this->tmpDir;
         $job = $this->helper->escape($this->job);
@@ -196,10 +174,7 @@ class BackgroundJob
         }
     }
 
-    /**
-     * @return bool
-     */
-    protected function shouldRun()
+    protected function shouldRun(): bool
     {
         if (!$this->config['enabled']) {
             return false;
@@ -219,20 +194,17 @@ class BackgroundJob
         return true;
     }
 
-    /**
-     * @param string $message
-     * @param string $output
-     */
-    protected function log($message, $output = 'stdout')
+    protected function log(string $message, string $output = 'stdout'): void
     {
         $now = date($this->config['dateFormat'], $_SERVER['REQUEST_TIME']);
 
-        if ($logfile = $this->getLogfile($output)) {
+        $logfile = $this->getLogfile($output);
+        if ($logfile !== false) {
             file_put_contents($logfile, "[$now] [$this->job] $message\n", FILE_APPEND);
         }
     }
 
-    protected function runFunction()
+    protected function runFunction(): void
     {
         $command = unserialize($this->config['closure']);
 
@@ -240,14 +212,16 @@ class BackgroundJob
         try {
             $retval = $command();
         } catch (Throwable $e) {
-            if ($logfile = $this->getLogfile('stderr')) {
-                file_put_contents($this->getLogfile('stderr'), "Error! " . $e->getMessage() . "\n", FILE_APPEND);
+            $logfile = $this->getLogfile('stderr');
+            if ($logfile !== false) {
+                file_put_contents($logfile, "Error! " . $e->getMessage() . "\n", FILE_APPEND);
             }
             $retval = $e->getMessage();
         }
         $content = ob_get_contents();
-        if ($logfile = $this->getLogfile()) {
-            file_put_contents($this->getLogfile(), $content, FILE_APPEND);
+        $logfile = $this->getLogfile();
+        if ($logfile !== false) {
+            file_put_contents($logfile, $content, FILE_APPEND);
         }
         ob_end_clean();
 
@@ -256,7 +230,7 @@ class BackgroundJob
         }
     }
 
-    protected function runFile()
+    protected function runFile(): void
     {
         // If job should run as another user, we must be on *nix and
         // must have sudo privileges.
