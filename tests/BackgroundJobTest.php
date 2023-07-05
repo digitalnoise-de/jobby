@@ -2,7 +2,7 @@
 
 namespace Jobby\Tests;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Jobby\BackgroundJob;
 use Jobby\Helper;
 use Opis\Closure\SerializableClosure;
@@ -11,7 +11,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @coversDefaultClass Jobby\BackgroundJob
  */
-class BackgroundJobTest extends PHPUnit_Framework_TestCase
+class BackgroundJobTest extends \PHPUnit\Framework\TestCase
 {
     public const JOB_NAME = 'name';
 

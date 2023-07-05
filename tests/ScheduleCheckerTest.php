@@ -4,9 +4,9 @@ namespace Jobby\Tests;
 
 use DateTimeImmutable;
 use Jobby\ScheduleChecker;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class ScheduleCheckerTest extends PHPUnit_Framework_TestCase
+class ScheduleCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ScheduleChecker

@@ -2,13 +2,13 @@
 
 namespace Jobby\Tests;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Jobby\Exception;
 
 /**
  * @covers Jobby\Exception
  */
-class ExceptionTest extends PHPUnit_Framework_TestCase
+class ExceptionTest extends \PHPUnit\Framework\TestCase
 {
     public function testInheritsBaseException()
     {

@@ -2,7 +2,7 @@
 
 namespace Jobby\Tests;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Countable;
 use Swift_Mailer;
 use Swift_NullTransport;
@@ -12,7 +12,7 @@ use Jobby\Jobby;
 /**
  * @coversDefaultClass Jobby\Helper
  */
-class HelperTest extends PHPUnit_Framework_TestCase
+class HelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Helper
@@ -100,6 +100,7 @@ class HelperTest extends PHPUnit_Framework_TestCase
     /**
      * @covers ::acquireLock
      * @covers ::releaseLock
+     * @doesNotPerformAssertions
      */
     public function testAquireAndReleaseLock()
     {
