@@ -23,7 +23,7 @@ class JobbyTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logFile = __DIR__ . '/_files/JobbyTest.log';
         if (file_exists($this->logFile)) {
@@ -36,7 +36,7 @@ class JobbyTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (file_exists($this->logFile)) {
             unlink($this->logFile);
@@ -184,8 +184,8 @@ class JobbyTest extends TestCase
         // Job runs asynchronously, so wait a bit
         sleep($this->getSleepTime());
 
-        static::assertContains('job-1', $this->getLogContent());
-        static::assertContains('job-2', $this->getLogContent());
+        static::assertStringContainsString('job-1', $this->getLogContent());
+        static::assertStringContainsString('job-2', $this->getLogContent());
     }
 
     /**
@@ -243,7 +243,7 @@ class JobbyTest extends TestCase
         $jobby->setConfig(['dateFormat' => 'foo bar']);
         $newCfg = $jobby->getConfig();
 
-        static::assertEquals(count($oldCfg), count($newCfg));
+        static::assertEquals(is_countable($oldCfg) ? count($oldCfg) : 0, is_countable($newCfg) ? count($newCfg) : 0);
         static::assertEquals('foo bar', $newCfg['dateFormat']);
     }
 
@@ -352,7 +352,7 @@ class JobbyTest extends TestCase
         $jobby->run();
         sleep(2);
 
-        static::assertContains('ERROR: MaxRuntime of 1 secs exceeded!', $this->getLogContent());
+        static::assertStringContainsString('ERROR: MaxRuntime of 1 secs exceeded!', $this->getLogContent());
     }
 
     /**

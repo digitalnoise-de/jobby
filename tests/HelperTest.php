@@ -27,7 +27,7 @@ class HelperTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->helper = new Helper();
         $this->tmpDir = $this->helper->getTempDir();
@@ -38,7 +38,7 @@ class HelperTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($_SERVER['APPLICATION_ENV']);
     }
@@ -275,14 +275,14 @@ class HelperTest extends TestCase
 
         $host = $helper->getHost();
         $email = "jobby@$host";
-        static::assertContains('job', $mail->getSubject());
-        static::assertContains("[$host]", $mail->getSubject());
+        static::assertStringContainsString('job', $mail->getSubject());
+        static::assertStringContainsString("[$host]", $mail->getSubject());
         static::assertEquals(1, is_countable($mail->getFrom()) ? count($mail->getFrom()) : 0);
         static::assertEquals('jobby', current($mail->getFrom()));
         static::assertEquals($email, current(array_keys($mail->getFrom())));
         static::assertEquals($email, current(array_keys($mail->getSender())));
-        static::assertContains($config['output'], $mail->getBody());
-        static::assertContains('message', $mail->getBody());
+        static::assertStringContainsString($config['output'], $mail->getBody());
+        static::assertStringContainsString('message', $mail->getBody());
     }
 
     /**

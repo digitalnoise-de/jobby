@@ -25,7 +25,7 @@ class BackgroundJobTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logFile = __DIR__ . '/_files/BackgroundJobTest.log';
         if (file_exists($this->logFile)) {
@@ -38,7 +38,7 @@ class BackgroundJobTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (file_exists($this->logFile)) {
             unlink($this->logFile);
@@ -73,7 +73,7 @@ class BackgroundJobTest extends TestCase
     public function testGetConfig()
     {
         $job = new BackgroundJob('test job',[]);
-        static::assertInternalType('array', $job->getConfig());
+        static::assertIsArray($job->getConfig());
     }
 
     /**
@@ -98,13 +98,13 @@ class BackgroundJobTest extends TestCase
     {
         $this->runJob(['command' => 'invalid-command']);
 
-        static::assertContains('invalid-command', $this->getLogContent());
+        static::assertStringContainsString('invalid-command', $this->getLogContent());
 
         if ($this->helper->getPlatform() === Helper::UNIX) {
-            static::assertContains('not found', $this->getLogContent());
-            static::assertContains("ERROR: Job exited with status '127'", $this->getLogContent());
+            static::assertStringContainsString('not found', $this->getLogContent());
+            static::assertStringContainsString("ERROR: Job exited with status '127'", $this->getLogContent());
         } else {
-            static::assertContains('not recognized as an internal or external command', $this->getLogContent());
+            static::assertStringContainsString('not recognized as an internal or external command', $this->getLogContent());
         }
     }
 
@@ -119,7 +119,7 @@ class BackgroundJobTest extends TestCase
             ]
         );
 
-        static::assertContains('ERROR: Closure did not return true! Returned:', $this->getLogContent());
+        static::assertStringContainsString('ERROR: Closure did not return true! Returned:', $this->getLogContent());
     }
 
     /**
@@ -183,8 +183,8 @@ class BackgroundJobTest extends TestCase
             ]
         );
 
-        static::assertContains('stdout output', @file_get_contents($stdout));
-        static::assertContains('stderr output', @file_get_contents($stderr));
+        static::assertStringContainsString('stdout output', @file_get_contents($stdout));
+        static::assertStringContainsString('stderr output', @file_get_contents($stderr));
 
         unlink($stderr);
         unlink($stdout);
@@ -278,7 +278,7 @@ class BackgroundJobTest extends TestCase
             $helper
         );
 
-        static::assertContains('MaxRuntime of 1 secs exceeded! Current runtime: 2 secs', $this->getLogContent());
+        static::assertStringContainsString('MaxRuntime of 1 secs exceeded! Current runtime: 2 secs', $this->getLogContent());
     }
 
     /**
