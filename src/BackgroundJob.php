@@ -7,8 +7,6 @@ class BackgroundJob
 {
     protected Helper $helper;
 
-    protected string $job;
-
     protected string $tmpDir;
 
     /**
@@ -19,9 +17,8 @@ class BackgroundJob
     /**
      * @param array<string, mixed> $config
      */
-    public function __construct(string $job, array $config, Helper $helper = null)
+    public function __construct(protected string $job, array $config, Helper $helper = null)
     {
-        $this->job    = $job;
         $this->config = $config + [
             'recipients'     => null,
             'mailer'         => null,
@@ -141,10 +138,7 @@ class BackgroundJob
         );
     }
 
-    /**
-     * @return string|false
-     */
-    protected function getLogfile(string $output = 'stdout')
+    protected function getLogfile(string $output = 'stdout'): string|false
     {
         $logfile = $this->config['output_' . $output];
         if (!is_string($logfile)) {

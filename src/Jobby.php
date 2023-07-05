@@ -89,9 +89,9 @@ class Jobby
     }
 
     /**
-     * @return array
+     * @return list<array{0: string, 1: array<string, mixed>}>
      */
-    public function getJobs()
+    public function getJobs(): array
     {
         return $this->jobs;
     }
@@ -183,19 +183,14 @@ class Jobby
     }
     // @codeCoverageIgnoreEnd
 
-    /**
-     * @param string $job
-     *
-     * @return string
-     */
-    protected function getExecutableCommand($job, array $config)
+    protected function getExecutableCommand(string $job, array $config): string
     {
         if (isset($config['closure'])) {
             $wrapper           = new SerializableClosure($config['closure']);
             $config['closure'] = serialize($wrapper);
         }
 
-        if (strpos(__DIR__, 'phar://') === 0) {
+        if (str_starts_with(__DIR__, 'phar://')) {
             $script = __DIR__ . DIRECTORY_SEPARATOR . 'BackgroundJob.php';
 
             return sprintf(' -r \'define("JOBBY_RUN_JOB",1);include("%s");\' "%s" "%s"', $script, $job, http_build_query($config));
@@ -204,13 +199,8 @@ class Jobby
         return sprintf('"%s" "%s" "%s"', $this->script, $job, http_build_query($config));
     }
 
-    /**
-     * @return false|string
-     */
-    protected function getPhpBinary()
+    protected function getPhpBinary(): string|false
     {
-        $executableFinder = new PhpExecutableFinder();
-
-        return $executableFinder->find();
+        return (new PhpExecutableFinder())->find();
     }
 }

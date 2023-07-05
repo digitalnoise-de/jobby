@@ -16,27 +16,18 @@ class Helper
     public const WINDOWS = 1;
 
     /**
-     * @var resource[]
+     * @var array<string, resource>
      */
     private array $lockHandles = [];
-
-    private ?\Swift_Mailer $mailer = null;
 
     /**
      * @param \Swift_Mailer $mailer
      */
-    public function __construct(\Swift_Mailer $mailer = null)
+    public function __construct(private ?\Swift_Mailer $mailer = null)
     {
-        $this->mailer = $mailer;
     }
 
-    /**
-     * @param string $job
-     * @param string $message
-     *
-     * @return \Swift_Message
-     */
-    public function sendMail($job, array $config, $message)
+    public function sendMail(string $job, array $config, string $message): \Swift_Message
     {
         $host = $this->getHost();
         $body = <<<EOF
@@ -60,10 +51,7 @@ EOF;
         return $mail;
     }
 
-    /**
-     * @return \Swift_Mailer
-     */
-    private function getCurrentMailer(array $config)
+    private function getCurrentMailer(array $config): \Swift_Mailer
     {
         if ($this->mailer !== null) {
             return $this->mailer;

@@ -17,7 +17,7 @@ class ScheduleChecker
     /**
      * @param string|callable(\DateTimeImmutable):bool $schedule
      */
-    public function isDue($schedule): bool
+    public function isDue(string|callable $schedule): bool
     {
         if (is_callable($schedule)) {
             return call_user_func($schedule, $this->now);
